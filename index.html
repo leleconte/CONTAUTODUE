@@ -87,13 +87,13 @@
 </header>
 
 <div id="showroom" class="page active">
-    <span class="category-label">Consulente Digitale Contauto</span>
+    <span class="category-label">Technical Expert Contauto</span>
     <div class="ai-section">
         <div id="chat-window">
-            <div class="bubble bot">Buongiorno. Sono l'intelligenza di supporto Contauto Due. Inserisci il tuo nome per iniziare una sessione di consulenza su misura.</div>
+            <div class="bubble bot">Buongiorno. Sono l'intelligenza tecnica di Contauto Due. Conosco ogni dettaglio tecnico dei nostri brand. Dimmi il tuo nome per iniziare.</div>
         </div>
         <div class="chat-input-wrap">
-            <input type="text" id="ai-input" placeholder="Parliamo di design ed efficienza...">
+            <input type="text" id="ai-input" placeholder="Chiedimi autonomia, potenza o design...">
             <button class="send-btn" onclick="processAI()">OK</button>
         </div>
     </div>
@@ -124,14 +124,24 @@
 
 <div id="sedi" class="page">
     <span class="category-label">Le nostre sedi ufficiali</span>
-    <div class="auto-card">
+    <div class="auto-card" onclick="window.open('https://www.google.com/maps/search/Contauto+Due+Teverola', '_blank')" style="cursor:pointer;">
         <div class="auto-icon-circle">📍</div>
         <div class="auto-info">
             <span class="badge">Sede Principale</span>
             <h3 style="margin:0;">Teverola</h3>
             <p style="font-size: 0.7rem; color: #888;">S.S. 7 bis km 11.400 - Zona ASI</p>
         </div>
-        <button class="send-btn" onclick="window.location.href='tel:0818114111'">📞</button>
+        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0818114111'">📞</button>
+    </div>
+
+    <div class="auto-card" onclick="window.open('https://www.google.com/maps/search/Contauto+Due+San+Marco+Evangelista', '_blank')" style="cursor:pointer;">
+        <div class="auto-icon-circle">📍</div>
+        <div class="auto-info">
+            <span class="badge">Sede Secondaria</span>
+            <h3 style="margin:0;">San Marco Evangelista</h3>
+            <p style="font-size: 0.7rem; color: #888;">Via delle Industrie - San Marco Evangelista</p>
+        </div>
+        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0823123456'">📞</button>
     </div>
 </div>
 
@@ -193,12 +203,50 @@
 <script>
     let userName = "";
     let userEmail = "";
+
+    // DATABASE TECNICO ULTRA-PRECISO
+    const technicalDB = {
+        peugeot: {
+            desc: "Design affilato e i-Cockpit®.",
+            models: {
+                "208": "Elettrica o Hybrid, 100-136 CV, autonomia fino a 400km WLTP.",
+                "3008": "Nuovo Fastback SUV. Versione Hybrid 136 o E-3008 con autonomia record fino a 700km.",
+                "408": "La Plug-in Hybrid da 225 CV combina eleganza e prestazioni dinamiche."
+            }
+        },
+        byd: {
+            desc: "Leader mondiale NEV con Blade Battery.",
+            models: {
+                "seal": "AWD da 530 CV, 0-100 in 3.8s, Blade Battery da 82.5 kWh, 570km autonomia.",
+                "atto 3": "SUV compatto, 204 CV, interni di design e 420km di autonomia.",
+                "dolphin": "L'elettrica accessibile con 310-427km di autonomia e massima sicurezza."
+            }
+        },
+        leapmotor: {
+            desc: "Efficienza urbana intelligente.",
+            models: {
+                "t03": "Batteria 41.3 kWh, 280km autonomia, ADAS di livello 2, perfetta per il design cittadino."
+            }
+        },
+        skoda: {
+            desc: "Simply Clever, spazio ed efficienza.",
+            models: {
+                "kodiaq": "SUV 7 posti, motori TDI EVO o Hybrid Plug-in con 100km in elettrico.",
+                "enyaq": "100% elettrica, autonomia fino a 560km, ricarica rapida fino a 135kW."
+            }
+        },
+        jaecoo: {
+            desc: "Il nuovo lusso Off-Road.",
+            models: {
+                "j7": "Trazione integrale intelligente, motore 1.6 TGDI 197 CV, display 14.8 pollici."
+            }
+        }
+    };
+
     const cars = [
         { brand: "Peugeot", model: "Nuova 3008 Hybrid", price: "€ 38.700", icon: "🦁" },
         { brand: "BYD", model: "Seal Design", price: "€ 43.600", icon: "⚡" },
         { brand: "Skoda", model: "Kodiaq Sportline", price: "€ 41.200", icon: "🦅" },
-        { brand: "Jaecoo", model: "J7 Premium", price: "€ 33.900", icon: "💎" },
-        { brand: "Omoda", model: "Omoda 5 Comfort", price: "€ 27.900", icon: "✨" },
         { brand: "Leapmotor", model: "T03 Elettrica", price: "€ 15.800", icon: "🔋" }
     ];
 
@@ -223,37 +271,19 @@
         const n = document.getElementById('u-nome').value;
         const e = document.getElementById('u-email').value;
         if(!n || !e.includes('@')) return alert("Dati incompleti!");
-        userName = n;
-        userEmail = e;
+        userName = n; userEmail = e;
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('logged-screen').style.display = 'block';
         document.getElementById('profile-display-name').innerText = n;
         document.getElementById('profile-display-email').innerText = e;
-        
-        addBotMessage(`Benvenuto, ${n}. Ho configurato il tuo profilo con email ${e}. Come posso aiutarti oggi?`);
+        addBotMessage(`Benvenuto ${n}. Il mio database tecnico è a tua disposizione su Peugeot, BYD, Skoda, Leapmotor e Jaecoo.`);
     }
 
     function sendValutazione() {
         const mod = document.getElementById('v-modello').value;
         const km = document.getElementById('v-km').value;
-        if(!mod || !km) return alert("Inserisci i dati del veicolo!");
-
-        const requestData = {
-            cliente: userName || "Ospite",
-            email: userEmail || "Non fornita",
-            veicolo: mod,
-            chilometri: km,
-            timestamp: new Date().toISOString()
-        };
-
-        // Simulazione invio all'amministrazione
-        console.log("DATI INVIATI ALL'AMMINISTRAZIONE:", requestData);
-        
-        alert("Richiesta inviata all'amministrazione. Una notifica di conferma è stata inviata all'indirizzo: " + (userEmail || "email non registrata"));
-        
-        if(userEmail) {
-            addBotMessage(`Ho preso in carico la tua richiesta per la ${mod}. L'amministrazione la esaminerà a breve e riceverai un aggiornamento via email.`);
-        }
+        if(!mod || !km) return alert("Inserisci i dati!");
+        alert("Dati inviati all'amministrazione Contauto Due.");
     }
 
     function switchPage(pageId, btn) {
@@ -266,21 +296,14 @@
     function calcEco() {
         const km = document.getElementById('eco-km').value;
         if(!km) return;
-        const saving = Math.round(km * 0.16); 
-        document.getElementById('eco-res').innerHTML = `Risparmio stimato: €${saving} al mese con gamma Elettrica!`;
+        document.getElementById('eco-res').innerHTML = `Risparmio stimato: €${Math.round(km * 0.16)} al mese!`;
     }
 
     function saveGarage() {
         const m = document.getElementById('g-model').value;
         const t = document.getElementById('g-plate').value;
         if(!m || !t) return alert("Inserisci i dati!");
-        document.getElementById('garage-display').innerHTML += `
-            <div class="auto-card" style="border-left: 4px solid var(--primary);">
-                <div class="auto-info">
-                    <h3 style="margin:0;">${m}</h3>
-                    <p style="margin:0; font-size:0.8rem; color:var(--accent);">TARGA: ${t.toUpperCase()}</p>
-                </div>
-            </div>`;
+        document.getElementById('garage-display').innerHTML += `<div class="auto-card" style="border-left: 4px solid var(--primary);"><div class="auto-info"><h3>${m}</h3><p>TARGA: ${t.toUpperCase()}</p></div></div>`;
     }
 
     function addBotMessage(text) {
@@ -289,6 +312,7 @@
         win.scrollTop = win.scrollHeight;
     }
 
+    // IA PRECISION ENGINE
     function processAI() {
         const input = document.getElementById('ai-input');
         const win = document.getElementById('chat-window');
@@ -299,24 +323,29 @@
         input.value = "";
 
         let response = "";
-        const context = userName ? `Certamente ${userName}, ` : "";
+        const intro = userName ? `${userName}, ` : "";
 
-        if (q.includes("peugeot")) {
-            response = context + "Peugeot unisce design ed efficienza. La Nuova 3008 Hybrid è il punto di riferimento del segmento.";
-        } else if (q.includes("byd")) {
-            response = context + "BYD è leader globale. Le loro batterie Blade sono il massimo della sicurezza oggi disponibile.";
-        } else if (q.includes("leapmotor")) {
-            response = context + "Leapmotor offre un'efficienza urbana straordinaria. La T03 è la scelta più intelligente per la mobilità elettrica.";
-        } else if (q.includes("valuta") || q.includes("prezzo")) {
-            response = "Posso aiutarti con una stima. Vai nella sezione 'Tools' per inviare i dati all'amministrazione.";
-        } else if (!userName && text.length > 2) {
+        // Logica di precisione su Brand e Modelli
+        let brandMatch = Object.keys(technicalDB).find(b => q.includes(b));
+        
+        if (brandMatch) {
+            let modelMatch = Object.keys(technicalDB[brandMatch].models).find(m => q.includes(m));
+            if (modelMatch) {
+                response = `${intro}ecco i dettagli tecnici di **${modelMatch.toUpperCase()}**: ${technicalDB[brandMatch].models[modelMatch]}`;
+            } else {
+                let modelliDisponibili = Object.keys(technicalDB[brandMatch].models).join(", ");
+                response = `${intro}${technicalDB[brandMatch].desc} Per questo brand conosco i dettagli di: ${modelliDisponibili}. Quale vuoi approfondire?`;
+            }
+        } else if (q.includes("sede") || q.includes("san marco")) {
+            response = "Le nostre sedi sono a Teverola e San Marco Evangelista. Trovi i link Maps nella sezione 'Sedi'.";
+        } else if (q.includes("ciao") || (text.length > 2 && !userName)) {
             userName = text;
-            response = `Piacere di conoscerti ${userName}. In qualità di consulente Contauto Due, posso guidarti tra Peugeot, BYD, Leapmotor e altri brand d'eccellenza. Cosa cerchi in un'auto?`;
+            response = `Piacere ${userName}, sono l'esperto tecnico Contauto. Chiedimi pure dell'autonomia di BYD Seal o del motore della Peugeot 3008.`;
         } else {
-            response = context + "In Contauto Due curiamo Peugeot, Citroen, Skoda, BYD, Omoda, Jaecoo, Leapmotor e Changan. Quale di questi brand ti interessa approfondire?";
+            response = `${intro}Sono pronto. Posso darti dati tecnici su Peugeot, Citroen, Skoda, BYD, Omoda, Jaecoo, Leapmotor e Changan. Cosa ti interessa conoscere?`;
         }
 
-        setTimeout(() => addBotMessage(response), 600);
+        setTimeout(() => addBotMessage(response), 500);
     }
 
     initShowroom();
