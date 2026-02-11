@@ -90,10 +90,10 @@
     <span class="category-label">Technical Expert Contauto</span>
     <div class="ai-section">
         <div id="chat-window">
-            <div class="bubble bot">Buongiorno. Sono l'intelligenza tecnica di Contauto Due. Conosco ogni dettaglio tecnico dei nostri brand. Dimmi il tuo nome per iniziare.</div>
+            <div class="bubble bot">Buongiorno. Sono l'intelligenza tecnica di Contauto Due. Conosco ogni dettaglio dei marchi Peugeot, Citroen, Skoda, Jaecoo, Omoda, Leapmotor, BYD e Changan. Dimmi il tuo nome.</div>
         </div>
         <div class="chat-input-wrap">
-            <input type="text" id="ai-input" placeholder="Chiedimi autonomia, potenza o design...">
+            <input type="text" id="ai-input" placeholder="Chiedimi di qualsiasi marchio o modello...">
             <button class="send-btn" onclick="processAI()">OK</button>
         </div>
     </div>
@@ -124,7 +124,7 @@
 
 <div id="sedi" class="page">
     <span class="category-label">Le nostre sedi ufficiali</span>
-    <div class="auto-card" onclick="window.open('https://www.google.com/maps/search/Contauto+Due+Teverola', '_blank')" style="cursor:pointer;">
+    <div class="auto-card" onclick="window.open('https://maps.google.com/?q=Contauto+Due+Teverola', '_blank')" style="cursor:pointer;">
         <div class="auto-icon-circle">📍</div>
         <div class="auto-info">
             <span class="badge">Sede Principale</span>
@@ -134,7 +134,7 @@
         <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0818114111'">📞</button>
     </div>
 
-    <div class="auto-card" onclick="window.open('https://www.google.com/maps/search/Contauto+Due+San+Marco+Evangelista', '_blank')" style="cursor:pointer;">
+    <div class="auto-card" onclick="window.open('https://maps.google.com/?q=Contauto+Due+San+Marco+Evangelista', '_blank')" style="cursor:pointer;">
         <div class="auto-icon-circle">📍</div>
         <div class="auto-info">
             <span class="badge">Sede Secondaria</span>
@@ -204,50 +204,80 @@
     let userName = "";
     let userEmail = "";
 
-    // DATABASE TECNICO ULTRA-PRECISO
     const technicalDB = {
         peugeot: {
-            desc: "Design affilato e i-Cockpit®.",
+            desc: "Design graffiante (Artiglio del Leone) e interni rivoluzionari i-Cockpit®.",
             models: {
-                "208": "Elettrica o Hybrid, 100-136 CV, autonomia fino a 400km WLTP.",
-                "3008": "Nuovo Fastback SUV. Versione Hybrid 136 o E-3008 con autonomia record fino a 700km.",
-                "408": "La Plug-in Hybrid da 225 CV combina eleganza e prestazioni dinamiche."
+                "208": "Disponibile Benzina, Hybrid (100/136 CV) o E-208 100% elettrica (fino a 410km WLTP).",
+                "2008": "SUV compatto. Versioni termiche o E-2008 elettrica. Design muscoloso e tech ADAS.",
+                "3008": "Nuovo SUV Fastback. Motorizzazione Hybrid 48V o E-3008 (fino a 700km di autonomia).",
+                "408": "La 'Dynamic Fastback'. Plug-in Hybrid da 180 o 225 CV. Design unico e aerodinamico.",
+                "5008": "Il grande SUV a 7 posti. Spazio infinito e tecnologia di vertice."
             }
         },
-        byd: {
-            desc: "Leader mondiale NEV con Blade Battery.",
+        citroen: {
+            desc: "Focus assoluto sul Comfort con sospensioni Progressive Hydraulic Cushions®.",
             models: {
-                "seal": "AWD da 530 CV, 0-100 in 3.8s, Blade Battery da 82.5 kWh, 570km autonomia.",
-                "atto 3": "SUV compatto, 204 CV, interni di design e 420km di autonomia.",
-                "dolphin": "L'elettrica accessibile con 310-427km di autonomia e massima sicurezza."
-            }
-        },
-        leapmotor: {
-            desc: "Efficienza urbana intelligente.",
-            models: {
-                "t03": "Batteria 41.3 kWh, 280km autonomia, ADAS di livello 2, perfetta per il design cittadino."
+                "c3": "Nuova generazione. Anche 100% elettrica (ë-C3). Comfort e accessibilità.",
+                "c3 aircross": "SUV versatile e spazioso, ideale per la famiglia.",
+                "c4": "Design crossover, comfort 'Advanced Comfort' unico. Anche 100% elettrica.",
+                "c5 aircross": "Il SUV più comodo del segmento, disponibile Plug-in Hybrid.",
+                "ami": "La soluzione di micro-mobilità 100% elettrica urbana."
             }
         },
         skoda: {
-            desc: "Simply Clever, spazio ed efficienza.",
+            desc: "Filosofia 'Simply Clever': spazio intelligente, praticità e solidità costruttiva.",
             models: {
-                "kodiaq": "SUV 7 posti, motori TDI EVO o Hybrid Plug-in con 100km in elettrico.",
-                "enyaq": "100% elettrica, autonomia fino a 560km, ricarica rapida fino a 135kW."
+                "fabia": "La compatta tecnologica con motori TSI efficienti.",
+                "kamiq": "City SUV di successo. Ergonomia perfetta e ottima connettività.",
+                "karoq": "SUV robusto e versatile per ogni tipo di terreno.",
+                "kodiaq": "Il SUV ammiraglia a 7 posti. Motori TDI EVO o nuovo Plug-in (100km EV).",
+                "octavia": "Icona di spazio e comfort (Wagon o Berlina). Versioni Hybrid e Metano.",
+                "enyaq": "Il SUV elettrico puro di Skoda. Fino a 560km di autonomia e ricarica ultra-rapida."
+            }
+        },
+        byd: {
+            desc: "Leader mondiale NEV con l'esclusiva Blade Battery (sicura ed efficiente).",
+            models: {
+                "dolphin": "Hatchback elettrica di segmento C, agile e sicura (427km WLTP).",
+                "atto 3": "SUV elettrico tech, interni futuristici e Blade Battery da 60 kWh.",
+                "seal": "Berlina sportiva 530 CV (AWD), 0-100 in 3.8s, tecnologia Cell-to-Body.",
+                "han": "Ammiraglia elettrica di lusso, prestazioni e rifiniture premium.",
+                "tang": "SUV 7 posti elettrico ad alte prestazioni."
+            }
+        },
+        leapmotor: {
+            desc: "Mobilità elettrica intelligente e democratica, partnership con Stellantis.",
+            models: {
+                "t03": "City car elettrica 5 porte. Batteria 41.3 kWh, 280km autonomia, ADAS di livello 2.",
+                "c10": "SUV familiare elettrico moderno, focus su sicurezza e connettività."
             }
         },
         jaecoo: {
-            desc: "Il nuovo lusso Off-Road.",
+            desc: "Nuovo brand di lusso specializzato in SUV con attitudine Off-Road.",
             models: {
-                "j7": "Trazione integrale intelligente, motore 1.6 TGDI 197 CV, display 14.8 pollici."
+                "j7": "SUV 4x4 intelligente. Motore 1.6 TGDI 197 CV, interni minimal e display 14.8 pollici."
+            }
+        },
+        omoda: {
+            desc: "Design futuristico (Art in Motion) e tecnologia ADAS di serie completa.",
+            models: {
+                "omoda 5": "Crossover sportivo 1.6 Turbo 147 CV o versione elettrica Omoda 5 EV."
+            }
+        },
+        changan: {
+            desc: "Uno dei colossi dell'innovazione asiatica, qualità costruttiva impeccabile.",
+            models: {
+                "deepal s07": "SUV elettrico dal design futuristico e tecnologia AI avanzata."
             }
         }
     };
 
     const cars = [
         { brand: "Peugeot", model: "Nuova 3008 Hybrid", price: "€ 38.700", icon: "🦁" },
-        { brand: "BYD", model: "Seal Design", price: "€ 43.600", icon: "⚡" },
-        { brand: "Skoda", model: "Kodiaq Sportline", price: "€ 41.200", icon: "🦅" },
-        { brand: "Leapmotor", model: "T03 Elettrica", price: "€ 15.800", icon: "🔋" }
+        { brand: "BYD", model: "Seal AWD 530CV", price: "€ 43.600", icon: "⚡" },
+        { brand: "Skoda", model: "Kodiaq 7 Posti", price: "€ 41.200", icon: "🦅" },
+        { brand: "Citroen", model: "Nuova ë-C3", price: "€ 23.900", icon: "☁️" }
     ];
 
     function initShowroom() {
@@ -276,7 +306,7 @@
         document.getElementById('logged-screen').style.display = 'block';
         document.getElementById('profile-display-name').innerText = n;
         document.getElementById('profile-display-email').innerText = e;
-        addBotMessage(`Benvenuto ${n}. Il mio database tecnico è a tua disposizione su Peugeot, BYD, Skoda, Leapmotor e Jaecoo.`);
+        addBotMessage(`Benvenuto ${n}! Sono pronto. Chiedimi qualsiasi cosa sui modelli Peugeot, BYD, Skoda, Citroen, Jaecoo o gli altri.`);
     }
 
     function sendValutazione() {
@@ -296,7 +326,7 @@
     function calcEco() {
         const km = document.getElementById('eco-km').value;
         if(!km) return;
-        document.getElementById('eco-res').innerHTML = `Risparmio stimato: €${Math.round(km * 0.16)} al mese!`;
+        document.getElementById('eco-res').innerHTML = `Risparmio stimato: €${Math.round(km * 0.16)} al mese rispetto al termico!`;
     }
 
     function saveGarage() {
@@ -312,7 +342,6 @@
         win.scrollTop = win.scrollHeight;
     }
 
-    // MOTORE IA ADATTIVO (Risposte Personalizzate Dinamiche)
     function processAI() {
         const input = document.getElementById('ai-input');
         const win = document.getElementById('chat-window');
@@ -326,35 +355,30 @@
         let response = "";
         const intro = userName ? `${userName}, ` : "";
 
-        // 1. GESTIONE NOME (Se non ancora salvato)
-        if (!userName && text.length < 15 && !q.includes("auto") && !q.includes("byd")) {
-            userName = text;
-            response = `Piacere di conoscerti ${userName}! In Contauto Due puntiamo tutto su design ed efficienza. C'è un brand tra Peugeot, BYD o Leapmotor che ti ha colpito particolarmente?`;
+        // GESTIONE INSULTI
+        const insults = ["cazzo", "merda", "schifo", "ritto"];
+        if (insults.some(word => q.includes(word))) {
+            response = `Ehi, manteniamo lo stile! In Contauto Due siamo professionisti del design e dell'efficienza. Dimmi cosa ti interessa davvero: Peugeot, BYD, Skoda o altro?`;
         } 
-        // 2. LOGICA DI CONSIGLIO E INTENTO
-        else if (q.includes("consiglia") || q.includes("quale") || q.includes("migliore")) {
-            response = `${intro}ottima domanda. Tutto dipende dal tuo stile: se cerchi un design unico l'i-Cockpit di Peugeot è imbattibile, se cerchi efficienza pura ti consiglio la Blade Battery di BYD. Qual è la tua priorità?`;
+        else if (!userName && text.length < 15 && !q.includes("auto")) {
+            userName = text;
+            response = `Piacere ${userName}! Con quale dei nostri marchi (Peugeot, Citroen, Skoda, BYD, Leapmotor, Jaecoo, Omoda, Changan) iniziamo oggi?`;
         }
-        // 3. LOGICA ESTETICA/DESIGN
-        else if (q.includes("bello") || q.includes("design") || q.includes("estetica")) {
-            response = `${intro}vedo che anche tu apprezzi il design! È un punto fermo qui da noi. Peugeot e Jaecoo curano ogni dettaglio estetico. Ti piacerebbe un SUV sportivo o qualcosa di più compatto per la città?`;
-        }
-        // 4. LOGICA TECNICA BRAND E MODELLI
         else {
-            let brandMatch = Object.keys(technicalDB).find(b => q.includes(b));
-            if (brandMatch) {
-                let modelMatch = Object.keys(technicalDB[brandMatch].models).find(m => q.includes(m));
-                if (modelMatch) {
-                    response = `${intro}per quanto riguarda **${modelMatch.toUpperCase()}**: ${technicalDB[brandMatch].models[modelMatch]}`;
+            let brandKey = Object.keys(technicalDB).find(b => q.includes(b));
+            if (brandKey) {
+                let modelKey = Object.keys(technicalDB[brandKey].models).find(m => q.includes(m));
+                if (modelKey) {
+                    response = `${intro}ecco i dettagli su **${brandKey.toUpperCase()} ${modelKey.toUpperCase()}**: ${technicalDB[brandKey].models[modelKey]}`;
                 } else {
-                    response = `${intro}${technicalDB[brandMatch].desc} Al momento ho dettagli tecnici su: ${Object.keys(technicalDB[brandMatch].models).join(", ")}. Cosa vuoi sapere di preciso?`;
+                    response = `${intro}riguardo a **${brandKey.toUpperCase()}**: ${technicalDB[brandKey].desc} Gestisco questi modelli: ${Object.keys(technicalDB[brandKey].models).join(", ")}. Quale ti interessa?`;
                 }
-            } else if (q.includes("consuma") || q.includes("autonomia") || q.includes("efficienza")) {
-                response = `${intro}l'efficienza è fondamentale. Per esempio, la Leapmotor T03 è perfetta per i bassi consumi urbani, mentre BYD domina sulla ricarica. Vuoi fare un calcolo del risparmio nei Tools?`;
-            } else if (q.includes("sede") || q.includes("dove")) {
-                response = "Siamo a Teverola e San Marco Evangelista. Ti servono le indicazioni stradali precise?";
+            } else if (q.includes("elettrica") || q.includes("batteria") || q.includes("autonomia")) {
+                response = `${intro}sull'elettrico siamo leader. Ti consiglio la tecnologia Blade Battery di **BYD** (es. Seal o Atto 3) o l'efficienza di **Leapmotor T03**. Vuoi un confronto tecnico?`;
+            } else if (q.includes("ibrida") || q.includes("hybrid") || q.includes("plug-in")) {
+                response = `${intro}abbiamo ottime opzioni Hybrid. La nuova **Peugeot 3008 48V** è eccezionale, mentre se cerchi un Plug-in con tanta autonomia EV guarda la **Skoda Kodiaq** o la **Peugeot 408**.`;
             } else {
-                response = `${intro}come esperto Contauto, il mio compito è aiutarti a trovare l'auto perfetta. Mi parli di Peugeot, BYD, Leapmotor o degli altri nostri brand?`;
+                response = `${intro}come esperto tecnico Contauto, posso darti dati su consumi, ADAS e design di Peugeot, BYD, Skoda, Citroen, Jaecoo, Omoda e Changan. Cosa preferisci?`;
             }
         }
 
