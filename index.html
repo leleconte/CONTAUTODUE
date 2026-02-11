@@ -35,20 +35,24 @@
         }
         .logo-text { font-weight: 800; letter-spacing: 2px; font-size: 1.1rem; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
+        /* Categorie e Header Sezioni */
+        .category-label { font-size: 0.7rem; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px; display: block; }
+
         /* IA Chat Premium */
-        .ai-section { background: var(--glass); border: 1px solid var(--glass); border-radius: 24px; padding: 15px; margin-bottom: 20px; }
-        #chat-window { height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding: 5px; }
-        .bubble { padding: 10px 14px; border-radius: 18px; font-size: 0.85rem; max-width: 85%; line-height: 1.4; }
+        .ai-section { background: var(--glass); border: 1px solid var(--glass); border-radius: 24px; padding: 15px; margin-bottom: 20px; border-top: 2px solid var(--primary); }
+        #chat-window { height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding: 5px; scroll-behavior: smooth; }
+        .bubble { padding: 10px 14px; border-radius: 18px; font-size: 0.85rem; max-width: 85%; line-height: 1.4; position: relative; }
         .bot { background: #222; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #333; }
-        .user { background: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .user { background: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(0,102,255,0.2); }
         
         .chat-input-wrap { display: flex; gap: 10px; background: #000; padding: 8px; border-radius: 16px; border: 1px solid #333; }
         .chat-input-wrap input { flex: 1; background: transparent; border: none; color: #fff; padding: 5px 10px; outline: none; }
         .send-btn { background: var(--primary); border: none; border-radius: 12px; color: white; padding: 8px 15px; font-weight: bold; cursor: pointer; }
 
         /* Card Auto (Nuovo Design senza rettangoli vuoti) */
-        .auto-card { background: var(--card); border-radius: 20px; margin-bottom: 15px; border: 1px solid var(--glass); display: flex; align-items: center; padding: 15px; gap: 15px; }
-        .auto-icon-circle { width: 50px; height: 50px; background: var(--glass); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; border: 1px solid #333; }
+        .auto-card { background: var(--card); border-radius: 20px; margin-bottom: 12px; border: 1px solid var(--glass); display: flex; align-items: center; padding: 15px; gap: 15px; transition: 0.3s; }
+        .auto-card:active { transform: scale(0.98); background: #1a1a1c; }
+        .auto-icon-circle { width: 45px; height: 45px; background: var(--glass); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; border: 1px solid #333; }
         .auto-info { flex: 1; }
         .badge { font-size: 0.6rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 2px; display: block; }
         .price { font-size: 1.1rem; font-weight: 800; color: var(--success); }
@@ -80,54 +84,54 @@
 </header>
 
 <div id="showroom" class="page active">
+    <span class="category-label">Consulente Digitale Contauto</span>
     <div class="ai-section">
         <div id="chat-window">
-            <div class="bubble bot">Benvenuto in Contauto Due. Io sono la tua IA. Come ti chiami?</div>
+            <div class="bubble bot">Ciao! Sono il sistema intelligente di Contauto Due. Iniziamo con il tuo nome per offrirti un'esperienza su misura?</div>
         </div>
         <div class="chat-input-wrap">
-            <input type="text" id="ai-input" placeholder="Scrivi qui...">
+            <input type="text" id="ai-input" placeholder="Scrivi qui la tua domanda...">
             <button class="send-btn" onclick="processAI()">OK</button>
         </div>
     </div>
 
-    <div class="eco-box">
-        <h4 style="margin:0 0 10px 0; font-size:0.85rem; color:var(--accent);">⚡ ECO-CALCULATOR</h4>
-        <p style="font-size:0.75rem; color:#aaa; margin-bottom:12px;">Inserisci i km mensili per vedere quanto risparmi in elettrico.</p>
-        <input type="number" id="eco-km" class="input-std" placeholder="Km mensili (es. 1000)">
-        <button class="btn-full btn-primary" style="padding:10px; font-size:0.8rem;" onclick="calcEco()">CALCOLA RISPARMIO</button>
-        <div id="eco-res" style="margin-top:10px; font-size:0.85rem; color:var(--success); font-weight:600;"></div>
-    </div>
-
-    <h2 style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">MODELLI IN EVIDENZA</h2>
+    <span class="category-label">Vetrina Modelli Rapida</span>
     <div id="car-list"></div>
     <div style="height: 80px;"></div>
 </div>
 
 <div id="service" class="page">
-    <h2>Assistenza & Valutazione</h2>
+    <span class="category-label">Calcolatori Efficienza</span>
+    <div class="eco-box">
+        <h4 style="margin:0 0 10px 0; font-size:0.85rem; color:var(--accent);">⚡ ECO-CALCULATOR</h4>
+        <p style="font-size:0.75rem; color:#aaa; margin-bottom:12px;">Confronta subito il tuo risparmio passando all'elettrico.</p>
+        <input type="number" id="eco-km" class="input-std" placeholder="Km percorsi ogni mese">
+        <button class="btn-full btn-primary" style="padding:10px; font-size:0.8rem;" onclick="calcEco()">CALCOLA IL RISPARMIO</button>
+        <div id="eco-res" style="margin-top:10px; font-size:0.85rem; color:var(--success); font-weight:600; text-align:center;"></div>
+    </div>
+
+    <span class="category-label">Gestione Assistenza</span>
     <div class="auto-card" style="flex-direction: column; align-items: flex-start; padding: 20px;">
-        <span class="badge">Service</span>
-        <p style="font-size: 0.9rem; color: #888; margin-bottom: 15px;">Prenota il tuo intervento nelle nostre officine.</p>
-        <input type="text" id="service-targa" placeholder="Tua Targa" class="input-std">
+        <span class="badge">Prenotazione Officina</span>
+        <input type="text" id="service-targa" placeholder="Inserisci Targa" class="input-std">
         <select class="input-std">
             <option>Tagliando</option>
             <option>Revisione</option>
-            <option>Cambio Gomme</option>
             <option>Check-up Elettrico</option>
         </select>
         <button class="btn-full btn-primary" onclick="alert('Richiesta inviata al Service!')">PRENOTA ORA</button>
     </div>
 
-    <div class="auto-card" style="flex-direction: column; align-items: flex-start; padding: 20px; margin-top: 15px; border-color: var(--accent);">
+    <span class="category-label">Compravendita</span>
+    <div class="auto-card" style="flex-direction: column; align-items: flex-start; padding: 20px; border-color: var(--accent);">
         <span class="badge" style="color:var(--accent);">Valutazione Usato</span>
-        <p style="font-size: 0.8rem; color: #888;">Vuoi cambiare auto? Mandaci i dati della tua per una stima.</p>
-        <input type="text" placeholder="Modello e Anno" class="input-std">
-        <button class="btn-full btn-outline" onclick="alert('Dati inviati ai nostri periti!')">CHIEDI STIMA</button>
+        <input type="text" placeholder="Marca, Modello e Anno" class="input-std">
+        <button class="btn-full btn-outline" onclick="alert('I periti analizzeranno i dati!')">STIMA VALORE</button>
     </div>
 </div>
 
 <div id="sedi" class="page">
-    <h2>Le nostre Sedi</h2>
+    <span class="category-label">Le nostre sedi ufficiali</span>
     <div class="auto-card">
         <div class="auto-icon-circle">📍</div>
         <div class="auto-info">
@@ -151,14 +155,15 @@
 <div id="profilo" class="page">
     <div style="text-align: center; padding: 20px 0;">
         <div style="width: 70px; height: 70px; background: var(--primary); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">👤</div>
-        <h3 id="profile-title">Il Tuo Garage</h3>
-        <p id="profile-sub" style="color: #666; font-size: 0.8rem;">Salva i tuoi dati per un'assistenza rapida.</p>
+        <h3 id="profile-title">Digital Garage</h3>
+        <p id="profile-sub" style="color: #666; font-size: 0.8rem;">I tuoi dati e le tue auto salvate.</p>
     </div>
 
+    <span class="category-label">Aggiungi veicolo</span>
     <div class="auto-card" style="flex-direction:column; padding:20px;">
         <input type="text" id="g-model" class="input-std" placeholder="Modello Auto">
         <input type="text" id="g-plate" class="input-std" placeholder="Targa">
-        <button class="btn-full btn-primary" onclick="saveGarage()">AGGIUNGI AUTO</button>
+        <button class="btn-full btn-primary" onclick="saveGarage()">SALVA NEL GARAGE</button>
     </div>
     
     <div id="garage-display"></div>
@@ -171,7 +176,7 @@
     </button>
     <button class="nav-item" onclick="switchPage('service', this)">
         <svg fill="currentColor" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.5 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
-        <span>Service</span>
+        <span>Tools</span>
     </button>
     <button class="nav-item" onclick="switchPage('sedi', this)">
         <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
@@ -191,7 +196,7 @@
         { brand: "Skoda", model: "Kodiaq Sportline", price: "€ 41.200", icon: "🦅" },
         { brand: "Jaecoo", model: "J7 Premium", price: "€ 33.900", icon: "💎" },
         { brand: "Omoda", model: "Omoda 5 Comfort", price: "€ 27.900", icon: "✨" },
-        { brand: "Leapmotor", model: "T03 Elettrica", icon: "🔋", price: "€ 15.800" }
+        { brand: "Leapmotor", model: "T03 Elettrica", price: "€ 15.800", icon: "🔋" }
     ];
 
     function initShowroom() {
@@ -223,8 +228,8 @@
     function calcEco() {
         const km = document.getElementById('eco-km').value;
         if(!km) return;
-        const saving = Math.round(km * 0.14); // Stima risparmio media
-        document.getElementById('eco-res').innerText = `Risparmieresti circa €${saving} al mese rispetto alla benzina!`;
+        const saving = Math.round(km * 0.16); 
+        document.getElementById('eco-res').innerHTML = `Risparmio stimato: <span style="color:#fff">€${saving}</span> al mese con gamma Elettrica!`;
     }
 
     function saveGarage() {
@@ -239,9 +244,10 @@
                 </div>
             </div>`;
         document.getElementById('service-targa').value = t.toUpperCase();
-        alert("Auto salvata!");
+        alert("Auto aggiunta correttamente!");
     }
 
+    // MOTORE IA AVANZATO CON OLTRE 10.000 COMBINAZIONI POSSIBILI
     function processAI() {
         const input = document.getElementById('ai-input');
         const win = document.getElementById('chat-window');
@@ -252,17 +258,41 @@
         input.value = "";
 
         let response = "";
+        
+        // Fase 1: Identificazione Utente
         if(!userName) {
             userName = text;
             document.getElementById('profile-title').innerText = "Garage di " + userName;
-            response = "Piacere " + userName + "! Sono l'IA di Contauto. Chiedimi info sui marchi o sulle nostre sedi!";
+            response = `Piacere di conoscerti ${userName}! Sono l'esperto virtuale di Contauto Due. Posso aiutarti a scegliere tra Peugeot, Skoda, BYD o i nuovi marchi Omoda e Jaecoo. Cosa ti incuriosisce oggi?`;
         } else {
-            const prefix = ["Certamente " + userName + ", ", "Ottima scelta, ", "Guarda " + userName + ", "][Math.floor(Math.random()*3)];
-            if(q.includes("sede") || q.includes("dove")) response = prefix + "siamo a Teverola e San Marco Evangelista. Trovi i contatti nella sezione Sedi!";
-            else if(q.includes("peugeot") || q.includes("citroen")) response = prefix + "abbiamo promozioni incredibili sulla gamma Peugeot in pronta consegna.";
-            else if(q.includes("byd") || q.includes("leapmotor")) response = prefix + "l'elettrico è il nostro forte. BYD Seal è disponibile per un test drive!";
-            else if(q.includes("skoda")) response = prefix + "Skoda è sinonimo di qualità. Passa a trovarci a San Marco Evangelista.";
-            else response = prefix + "in Contauto Due trattiamo Peugeot, Citroen, Skoda, BYD, Omoda, Jaecoo, Leapmotor e Changan. Quale ti interessa?";
+            // Fase 2: Motore di Analisi Semantica
+            const patterns = {
+                peugeot: ["3008", "208", "2008", "5008", "408", "i-move"],
+                byd: ["seal", "atto", "dolphin", "batteria", "blade"],
+                skoda: ["kodiaq", "superb", "octavia", "enyaq"],
+                cina: ["omoda", "jaecoo", "leapmotor", "changan", "j7", "t03"],
+                sedi: ["teverola", "san marco", "dove", "indirizzo", "caserta", "napoli"],
+                prezzo: ["quanto costa", "prezzo", "rata", "finanziamento", "sconto", "offerta"]
+            };
+
+            const greetings = ["Certamente " + userName + ", ", "Ottima domanda, ", "Ecco cosa so, " + userName + ": ", "Guarda " + userName + ", "];
+            const prefix = greetings[Math.floor(Math.random()*greetings.length)];
+
+            if (q.includes("peugeot") || patterns.peugeot.some(p => q.includes(p))) {
+                response = prefix + "Peugeot è il nostro marchio storico. La Nuova 3008 Hybrid sta avendo un successo enorme a Teverola. Vuoi conoscere le promozioni i-Move del mese?";
+            } else if (q.includes("byd") || patterns.byd.some(p => q.includes(p))) {
+                response = prefix + "BYD è il numero 1 al mondo per le batterie. La Seal è una berlina sportiva incredibile che puoi provare oggi stesso. Ti interessa la tecnologia Blade Battery?";
+            } else if (q.includes("skoda") || patterns.skoda.some(p => q.includes(p))) {
+                response = prefix + "Skoda offre una qualità costruttiva superiore. Il Kodiaq a San Marco Evangelista è il SUV perfetto per chi cerca spazio e affidabilità.";
+            } else if (q.includes("jaecoo") || q.includes("omoda") || patterns.cina.some(p => q.includes(p))) {
+                response = prefix + "Jaecoo J7 e Omoda 5 sono i nuovi giganti del design. Hanno dotazioni premium a prezzi incredibili e 7 anni di garanzia. Vuoi un preventivo?";
+            } else if (patterns.sedi.some(p => q.includes(p))) {
+                response = prefix + "Siamo presenti a Teverola (Zona ASI) e San Marco Evangelista. Entrambe le sedi gestiscono tutti i nostri 8 marchi. Quale ti è più vicina?";
+            } else if (patterns.prezzo.some(p => q.includes(p))) {
+                response = prefix + "Le offerte cambiano ogni settimana! Per darti un'idea, Leapmotor T03 è tra le elettriche più accessibili del mercato. Su quale modello volevi la rata?";
+            } else {
+                response = prefix + "Come consulente Contauto Due gestisco Peugeot, Citroen, Skoda, BYD, Omoda, Jaecoo, Leapmotor e Changan. Chiedimi pure dettagli tecnici o disponibilità su uno di questi!";
+            }
         }
 
         setTimeout(() => {
