@@ -312,12 +312,13 @@
         win.scrollTop = win.scrollHeight;
     }
 
-    // IA PRECISION ENGINE
+    // MOTORE IA ADATTIVO (Risposte Personalizzate Dinamiche)
     function processAI() {
         const input = document.getElementById('ai-input');
         const win = document.getElementById('chat-window');
         const text = input.value.trim();
         if(!text) return;
+        
         win.innerHTML += `<div class="bubble user">${text}</div>`;
         const q = text.toLowerCase();
         input.value = "";
@@ -325,27 +326,39 @@
         let response = "";
         const intro = userName ? `${userName}, ` : "";
 
-        // Logica di precisione su Brand e Modelli
-        let brandMatch = Object.keys(technicalDB).find(b => q.includes(b));
-        
-        if (brandMatch) {
-            let modelMatch = Object.keys(technicalDB[brandMatch].models).find(m => q.includes(m));
-            if (modelMatch) {
-                response = `${intro}ecco i dettagli tecnici di **${modelMatch.toUpperCase()}**: ${technicalDB[brandMatch].models[modelMatch]}`;
-            } else {
-                let modelliDisponibili = Object.keys(technicalDB[brandMatch].models).join(", ");
-                response = `${intro}${technicalDB[brandMatch].desc} Per questo brand conosco i dettagli di: ${modelliDisponibili}. Quale vuoi approfondire?`;
-            }
-        } else if (q.includes("sede") || q.includes("san marco")) {
-            response = "Le nostre sedi sono a Teverola e San Marco Evangelista. Trovi i link Maps nella sezione 'Sedi'.";
-        } else if (q.includes("ciao") || (text.length > 2 && !userName)) {
+        // 1. GESTIONE NOME (Se non ancora salvato)
+        if (!userName && text.length < 15 && !q.includes("auto") && !q.includes("byd")) {
             userName = text;
-            response = `Piacere ${userName}, sono l'esperto tecnico Contauto. Chiedimi pure dell'autonomia di BYD Seal o del motore della Peugeot 3008.`;
-        } else {
-            response = `${intro}Sono pronto. Posso darti dati tecnici su Peugeot, Citroen, Skoda, BYD, Omoda, Jaecoo, Leapmotor e Changan. Cosa ti interessa conoscere?`;
+            response = `Piacere di conoscerti ${userName}! In Contauto Due puntiamo tutto su design ed efficienza. C'è un brand tra Peugeot, BYD o Leapmotor che ti ha colpito particolarmente?`;
+        } 
+        // 2. LOGICA DI CONSIGLIO E INTENTO
+        else if (q.includes("consiglia") || q.includes("quale") || q.includes("migliore")) {
+            response = `${intro}ottima domanda. Tutto dipende dal tuo stile: se cerchi un design unico l'i-Cockpit di Peugeot è imbattibile, se cerchi efficienza pura ti consiglio la Blade Battery di BYD. Qual è la tua priorità?`;
+        }
+        // 3. LOGICA ESTETICA/DESIGN
+        else if (q.includes("bello") || q.includes("design") || q.includes("estetica")) {
+            response = `${intro}vedo che anche tu apprezzi il design! È un punto fermo qui da noi. Peugeot e Jaecoo curano ogni dettaglio estetico. Ti piacerebbe un SUV sportivo o qualcosa di più compatto per la città?`;
+        }
+        // 4. LOGICA TECNICA BRAND E MODELLI
+        else {
+            let brandMatch = Object.keys(technicalDB).find(b => q.includes(b));
+            if (brandMatch) {
+                let modelMatch = Object.keys(technicalDB[brandMatch].models).find(m => q.includes(m));
+                if (modelMatch) {
+                    response = `${intro}per quanto riguarda **${modelMatch.toUpperCase()}**: ${technicalDB[brandMatch].models[modelMatch]}`;
+                } else {
+                    response = `${intro}${technicalDB[brandMatch].desc} Al momento ho dettagli tecnici su: ${Object.keys(technicalDB[brandMatch].models).join(", ")}. Cosa vuoi sapere di preciso?`;
+                }
+            } else if (q.includes("consuma") || q.includes("autonomia") || q.includes("efficienza")) {
+                response = `${intro}l'efficienza è fondamentale. Per esempio, la Leapmotor T03 è perfetta per i bassi consumi urbani, mentre BYD domina sulla ricarica. Vuoi fare un calcolo del risparmio nei Tools?`;
+            } else if (q.includes("sede") || q.includes("dove")) {
+                response = "Siamo a Teverola e San Marco Evangelista. Ti servono le indicazioni stradali precise?";
+            } else {
+                response = `${intro}come esperto Contauto, il mio compito è aiutarti a trovare l'auto perfetta. Mi parli di Peugeot, BYD, Leapmotor o degli altri nostri brand?`;
+            }
         }
 
-        setTimeout(() => addBotMessage(response), 500);
+        setTimeout(() => addBotMessage(response), 600);
     }
 
     initShowroom();
