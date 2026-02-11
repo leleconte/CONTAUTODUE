@@ -81,6 +81,9 @@
           
         /* Stile Auth */ 
         .auth-container { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--glass); margin-top: 10px; } 
+        
+        /* Stili Admin Aggiuntivi */
+        .admin-item { background: #1a1a1c; padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 3px solid var(--primary); }
     </style> 
 </head> 
 <body> 
@@ -115,6 +118,26 @@
     <p style="font-size: 0.7rem; color: #555; text-align: center; margin-top: 20px;">Le offerte vengono aggiornate in tempo reale dall'ufficio commerciale.</p> 
 </div> 
 
+<div id="sedi" class="page">
+    <span class="category-label">Le Nostre Sedi</span>
+    <div class="auto-card" onclick="window.open('https://www.google.com/maps/search/?api=1&query=Contauto+Due+Teverola')">
+        <div class="auto-icon-circle">📍</div>
+        <div class="auto-info">
+            <h3 style="margin:0;">Teverola (CE)</h3>
+            <p style="font-size:0.7rem; color:#888;">S.S. 7 bis km 11.400 - Zona ASI</p>
+        </div>
+        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0818114111'">📞</button>
+    </div>
+    <div class="auto-card" onclick="window.open('https://www.google.com/maps/search/?api=1&query=Contauto+Due+San+Marco+Evangelista')">
+        <div class="auto-icon-circle">📍</div>
+        <div class="auto-info">
+            <h3 style="margin:0;">Caserta Sud</h3>
+            <p style="font-size:0.7rem; color:#888;">Via delle Industrie - S. Marco Ev.</p>
+        </div>
+        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0823123456'">📞</button>
+    </div>
+</div>
+
 <div id="service" class="page"> 
     <span class="category-label">Calcolatori Efficienza</span> 
     <div class="eco-box"> 
@@ -144,9 +167,10 @@
 
     <div id="admin-dashboard" style="display:none;">
         <div style="background: var(--promo); padding: 10px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
-            <h3 style="margin:0; font-size: 0.8rem;">GESTIONE OFFERTE ATTIVA</h3>
+            <h3 style="margin:0; font-size: 0.8rem;">GESTIONE HUB ATTIVA</h3>
         </div>
-        <span class="category-label">Nuova Promo Rapida</span>
+        
+        <span class="category-label">Nuova Promo / Elimina Esistenti</span>
         <div class="ai-section">
             <input type="text" id="adm-brand" class="input-std" placeholder="Brand (es. LEAPMOTOR)">
             <input type="text" id="adm-model" class="input-std" placeholder="Modello">
@@ -154,6 +178,13 @@
             <input type="text" id="adm-tag" class="input-std" placeholder="Tag (es. SOTTOCOSTO)">
             <button class="btn-full btn-primary" onclick="adminPublish()">PUBBLICA ORA</button>
         </div>
+        <div id="admin-promo-manage-list"></div>
+
+        <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+
+        <span class="category-label">Richieste Valutazione Usato</span>
+        <div id="admin-leads-list"></div>
+
         <button class="btn-full btn-outline" onclick="location.reload()">CHIUDI SESSIONE</button>
     </div>
 </div>
@@ -203,6 +234,10 @@
         <svg fill="currentColor" viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.42-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg> 
         <span>Promo</span> 
     </button> 
+    <button class="nav-item" onclick="switchPage('sedi', this)"> 
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> 
+        <span>Sedi</span> 
+    </button> 
     <button class="nav-item" onclick="switchPage('admin', this)"> 
         <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> 
         <span>Admin</span> 
@@ -217,12 +252,13 @@
     let userName = ""; 
     let userEmail = ""; 
     const MASTER_PIN = "1234";
+    let leadValutazioni = []; // Array per memorizzare le richieste di valutazione
 
     // DATABASE PROMOZIONI 
     let adminPromos = [ 
-        { brand: "PEUGEOT", model: "Nuova 208 Hybrid", offer: "Tua da € 149/mese", tag: "SOTTOCOSTO", date: "Scade 28/02" }, 
-        { brand: "BYD", model: "Atto 3 Elettrica", offer: "EcoBonus + Wallbox Gratis", tag: "GREEN", date: "Scade 15/03" }, 
-        { brand: "LEAPMOTOR", model: "T03 Urban", offer: "City car elettrica a tasso zero", tag: "SMART", date: "Offerta Limitata" } 
+        { id: 1, brand: "PEUGEOT", model: "Nuova 208 Hybrid", offer: "Tua da € 149/mese", tag: "SOTTOCOSTO", date: "Scade 28/02" }, 
+        { id: 2, brand: "BYD", model: "Atto 3 Elettrica", offer: "EcoBonus + Wallbox Gratis", tag: "GREEN", date: "Scade 15/03" }, 
+        { id: 3, brand: "LEAPMOTOR", model: "T03 Urban", offer: "City car elettrica a tasso zero", tag: "SMART", date: "Offerta Limitata" } 
     ]; 
 
     const technicalDB = { 
@@ -321,15 +357,19 @@
             `; 
         }); 
 
-        renderPromos();
+        renderPromos(); 
     } 
 
-    function renderPromos() {
+    function renderPromos() { 
         const promoHome = document.getElementById('promo-home-list'); 
         const promoFull = document.getElementById('full-promo-list'); 
+        const adminManage = document.getElementById('admin-promo-manage-list');
+        
         let promoHTML = ""; 
+        let adminHTML = "";
+
         adminPromos.forEach(p => { 
-            promoHTML += ` 
+            const card = ` 
                 <div class="auto-card promo-card"> 
                     <div class="auto-info"> 
                         <span class="badge">${p.brand} <span class="promo-tag">${p.tag}</span></span> 
@@ -339,132 +379,178 @@
                     </div> 
                 </div> 
             `; 
+            promoHTML += card;
+            adminHTML += `
+                <div class="auto-card" style="padding:10px; border-color:var(--promo);">
+                    <div class="auto-info" style="font-size:0.8rem;"><b>${p.brand}</b> - ${p.model}</div>
+                    <button onclick="adminDeletePromo(${p.id})" style="background:var(--promo); color:white; border:none; padding:5px 10px; border-radius:8px; font-size:0.7rem;">ELIMINA</button>
+                </div>
+            `;
         }); 
         promoHome.innerHTML = promoHTML; 
         promoFull.innerHTML = promoHTML; 
-    }
+        if(adminManage) adminManage.innerHTML = adminHTML;
+    } 
 
-    // LOGICA ADMIN
-    function unlockAdmin() {
-        const pin = document.getElementById('admin-pin-field').value;
-        if(pin === MASTER_PIN) {
-            document.getElementById('admin-auth').style.display = 'none';
-            document.getElementById('admin-dashboard').style.display = 'block';
-        } else {
-            alert("PIN Errato!");
+    function adminDeletePromo(id) {
+        if(confirm("Eliminare questa promozione?")) {
+            adminPromos = adminPromos.filter(p => p.id !== id);
+            renderPromos();
         }
     }
 
-    function adminPublish() {
-        const b = document.getElementById('adm-brand').value.toUpperCase();
-        const m = document.getElementById('adm-model').value;
-        const o = document.getElementById('adm-offer').value;
-        const t = document.getElementById('adm-tag').value.toUpperCase();
+    // LOGICA ADMIN 
+    function unlockAdmin() { 
+        const pin = document.getElementById('admin-pin-field').value; 
+        if(pin === MASTER_PIN) { 
+            document.getElementById('admin-auth').style.display = 'none'; 
+            document.getElementById('admin-dashboard').style.display = 'block'; 
+            renderPromos();
+            renderAdminLeads();
+        } else { 
+            alert("PIN Errato!"); 
+        } 
+    } 
 
-        if(!b || !m || !o) return alert("Compila i campi principali!");
+    function adminPublish() { 
+        const b = document.getElementById('adm-brand').value.toUpperCase(); 
+        const m = document.getElementById('adm-model').value; 
+        const o = document.getElementById('adm-offer').value; 
+        const t = document.getElementById('adm-tag').value.toUpperCase(); 
 
-        adminPromos.unshift({
-            brand: b, model: m, offer: o, tag: t || "PROMO", date: "Aggiornato ora"
-        });
+        if(!b || !m || !o) return alert("Compila i campi principali!"); 
 
-        renderPromos();
-        alert("Offerta pubblicata con successo!");
-        document.getElementById('adm-brand').value = "";
-        document.getElementById('adm-model').value = "";
-        document.getElementById('adm-offer').value = "";
+        adminPromos.unshift({ 
+            id: Date.now(), brand: b, model: m, offer: o, tag: t || "PROMO", date: "Aggiornato ora" 
+        }); 
+
+        renderPromos(); 
+        alert("Offerta pubblicata con successo!"); 
+        document.getElementById('adm-brand').value = ""; 
+        document.getElementById('adm-model').value = ""; 
+        document.getElementById('adm-offer').value = ""; 
+    } 
+
+    function renderAdminLeads() {
+        const list = document.getElementById('admin-leads-list');
+        if(!list) return;
+        list.innerHTML = leadValutazioni.map((l, index) => `
+            <div class="admin-item">
+                <div style="font-size:0.8rem;">
+                    <b>Modello:</b> ${l.modello}<br>
+                    <b>KM:</b> ${l.km}<br>
+                    <small>Ricevuta da: ${l.user || "Ospite"}</small>
+                </div>
+                <button onclick="respondToLead(${index})" class="btn-full btn-primary" style="padding:5px; font-size:0.7rem; margin-top:5px;">RISPONDI AL CLIENTE</button>
+            </div>
+        `).join('') || "<p style='font-size:0.7rem; color:#555;'>Nessuna richiesta pendente.</p>";
     }
 
-    function doLogin() { 
-        const n = document.getElementById('u-nome').value; 
-        const e = document.getElementById('u-email').value; 
-        if(!n || !e.includes('@')) return alert("Dati incompleti!"); 
-        userName = n; userEmail = e; 
-        document.getElementById('auth-screen').style.display = 'none'; 
-        document.getElementById('logged-screen').style.display = 'block'; 
-        document.getElementById('profile-display-name').innerText = n; 
-        document.getElementById('profile-display-email').innerText = e; 
-        addBotMessage(`Benvenuto ${n}! Sono pronto. Chiedimi qualsiasi cosa sui modelli Peugeot, BYD, Skoda, Leapmotor, Jaecoo o gli altri.`); 
-    } 
+    function respondToLead(index) {
+        alert("Sistema di risposta attivato per: " + leadValutazioni[index].modello + ". Il cliente riceverà una notifica.");
+    }
 
-    function sendValutazione() { 
-        const mod = document.getElementById('v-modello').value; 
-        const km = document.getElementById('v-km').value; 
-        if(!mod || !km) return alert("Inserisci i dati!"); 
-        alert("Dati inviati all'amministrazione Contauto Due."); 
-    } 
+    function doLogin() {  
+        const n = document.getElementById('u-nome').value;  
+        const e = document.getElementById('u-email').value;  
+        if(!n || !e.includes('@')) return alert("Dati incompleti!");  
+        userName = n; userEmail = e;  
+        document.getElementById('auth-screen').style.display = 'none';  
+        document.getElementById('logged-screen').style.display = 'block';  
+        document.getElementById('profile-display-name').innerText = n;  
+        document.getElementById('profile-display-email').innerText = e;  
+        addBotMessage(`Benvenuto ${n}! Sono pronto. Chiedimi qualsiasi cosa sui modelli Peugeot, BYD, Skoda, Leapmotor, Jaecoo o gli altri.`);  
+    }  
 
-    function switchPage(pageId, btn) { 
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
-        document.getElementById(pageId).classList.add('active'); 
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); 
-        btn.classList.add('active'); 
-    } 
+    function sendValutazione() {  
+        const mod = document.getElementById('v-modello').value;  
+        const km = document.getElementById('v-km').value;  
+        if(!mod || !km) return alert("Inserisci i dati!");  
+        
+        // Salva la richiesta per l'admin
+        leadValutazioni.push({ modello: mod, km: km, user: userName || "Anonimo" });
+        
+        alert("Dati inviati all'amministrazione Contauto Due.");  
+        document.getElementById('v-modello').value = "";
+        document.getElementById('v-km').value = "";
+    }  
 
-    function calcEco() { 
-        const km = document.getElementById('eco-km').value; 
-        if(!km) return; 
-        document.getElementById('eco-res').innerHTML = `Risparmio stimato: €${Math.round(km * 0.16)} al mese rispetto al termico!`; 
-    } 
+    function switchPage(pageId, btn) {  
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));  
+        document.getElementById(pageId).classList.add('active');  
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));  
+        btn.classList.add('active');  
+        if(pageId === 'admin' && document.getElementById('admin-dashboard').style.display === 'block') {
+            renderPromos();
+            renderAdminLeads();
+        }
+    }  
 
-    function saveGarage() { 
-        const m = document.getElementById('g-model').value; 
-        const t = document.getElementById('g-plate').value; 
-        if(!m || !t) return alert("Inserisci i dati!"); 
-        document.getElementById('garage-display').innerHTML += `<div class="auto-card" style="border-left: 4px solid var(--primary);"><div class="auto-info"><h3>${m}</h3><p>TARGA: ${t.toUpperCase()}</p></div></div>`; 
-    } 
+    function calcEco() {  
+        const km = document.getElementById('eco-km').value;  
+        if(!km) return;  
+        document.getElementById('eco-res').innerHTML = `Risparmio stimato: €${Math.round(km * 0.16)} al mese rispetto al termico!`;  
+    }  
 
-    function addBotMessage(text) { 
-        const win = document.getElementById('chat-window'); 
-        win.innerHTML += `<div class="bubble bot">${text}</div>`; 
-        win.scrollTop = win.scrollHeight; 
-    } 
+    function saveGarage() {  
+        const m = document.getElementById('g-model').value;  
+        const t = document.getElementById('g-plate').value;  
+        if(!m || !t) return alert("Inserisci i dati!");  
+        document.getElementById('garage-display').innerHTML += `<div class="auto-card" style="border-left: 4px solid var(--primary);"><div class="auto-info"><h3>${m}</h3><p>TARGA: ${t.toUpperCase()}</p></div></div>`;  
+    }  
 
-    function processAI() { 
-        const input = document.getElementById('ai-input'); 
-        const win = document.getElementById('chat-window'); 
-        const text = input.value.trim(); 
-        if(!text) return; 
+    function addBotMessage(text) {  
+        const win = document.getElementById('chat-window');  
+        win.innerHTML += `<div class="bubble bot">${text}</div>`;  
+        win.scrollTop = win.scrollHeight;  
+    }  
+
+    function processAI() {  
+        const input = document.getElementById('ai-input');  
+        const win = document.getElementById('chat-window');  
+        const text = input.value.trim();  
+        if(!text) return;  
           
-        win.innerHTML += `<div class="bubble user">${text}</div>`; 
-        const q = text.toLowerCase(); 
-        input.value = ""; 
+        win.innerHTML += `<div class="bubble user">${text}</div>`;  
+        const q = text.toLowerCase();  
+        input.value = "";  
 
-        let response = ""; 
-        const intro = userName ? `${userName}, ` : ""; 
+        let response = "";  
+        const intro = userName ? `${userName}, ` : "";  
 
-        const isFamily = q.includes("famiglia") || q.includes("spazio") || q.includes("figli"); 
-        const isElectric = q.includes("elettrica") || q.includes("batteria") || q.includes("autonomia"); 
-        const isOffer = q.includes("offerta") || q.includes("promozione") || q.includes("sconto"); 
+        const isFamily = q.includes("famiglia") || q.includes("spazio") || q.includes("figli");  
+        const isElectric = q.includes("elettrica") || q.includes("batteria") || q.includes("autonomia");  
+        const isOffer = q.includes("offerta") || q.includes("promozione") || q.includes("sconto");  
 
-        let brandKey = Object.keys(technicalDB).find(b => q.includes(b)); 
+        let brandKey = Object.keys(technicalDB).find(b => q.includes(b));  
 
-        if (brandKey) { 
-            const data = technicalDB[brandKey]; 
-            let modelKey = Object.keys(data.models).find(m => q.includes(m)); 
+        if (brandKey) {  
+            const data = technicalDB[brandKey];  
+            let modelKey = Object.keys(data.models).find(m => q.includes(m));  
               
-            if (modelKey) { 
-                response = `${intro}La **${brandKey.toUpperCase()} ${modelKey.toUpperCase()}** è un'ottima scelta. ${data.models[modelKey]} Vuoi approfondire l'allestimento?`; 
-            } else { 
-                response = `${intro}per **${brandKey.toUpperCase()}**, i modelli che trattiamo sono: ${Object.keys(data.models).join(", ")}. Quale ti interessa analizzare tecnicamente?`; 
-            } 
+            if (modelKey) {  
+                response = `${intro}La **${brandKey.toUpperCase()} ${modelKey.toUpperCase()}** è un'ottima scelta. ${data.models[modelKey]} Vuoi approfondire l'allestimento?`;  
+            } else {  
+                response = `${intro}per **${brandKey.toUpperCase()}**, i modelli che trattiamo sono: ${Object.keys(data.models).join(", ")}. Quale ti interessa analizzare tecnicamente?`;  
+            }  
+        }   
+        else if (isFamily) {  
+            response = `${intro}per la famiglia ti consiglio la **Skoda Kodiaq** (7 posti) o la nuova **Leapmotor C10**, spaziosa ed elettrica.`;  
         }  
-        else if (isFamily) { 
-            response = `${intro}per la famiglia ti consiglio la **Skoda Kodiaq** (7 posti) o la nuova **Leapmotor C10**, spaziosa ed elettrica.`; 
-        } 
-        else if (isElectric) { 
-            response = `${intro}sull'elettrico abbiamo il top: la Blade Battery di **BYD** o l'accessibilità della **Leapmotor T03**.`; 
-        } 
-        else if (isOffer) { 
-            response = `${intro}abbiamo ottime promozioni su **Peugeot 208** e **Leapmotor**. Controlla la sezione Promo in basso!`; 
-        } 
-        else { 
-            response = `${intro}come esperto tecnico, posso aiutarti su Peugeot, BYD, Skoda, Leapmotor, Jaecoo, Omoda, Changan e Citroen. Cosa cerchi oggi?`; 
-        } 
+        else if (isElectric) {  
+            response = `${intro}sull'elettrico abbiamo il top: la Blade Battery di **BYD** o l'accessibilità della **Leapmotor T03**.`;  
+        }  
+        else if (isOffer) {  
+            response = `${intro}abbiamo ottime promozioni su **Peugeot 208** e **Leapmotor**. Controlla la sezione Promo in basso!`;  
+        }  
+        else {  
+            response = `${intro}come esperto tecnico, posso aiutarti su Peugeot, BYD, Skoda, Leapmotor, Jaecoo, Omoda, Changan e Citroen. Cosa cerchi oggi?`;  
+        }  
 
-        setTimeout(() => addBotMessage(response), 600); 
-    } 
+        setTimeout(() => addBotMessage(response), 600);  
+    }  
 
-    initShowroom(); 
+    initShowroom();  
 </script> 
 </body> 
 </html>
