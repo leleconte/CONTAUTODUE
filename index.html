@@ -82,8 +82,8 @@
         /* Stile Auth */ 
         .auth-container { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--glass); margin-top: 10px; } 
         
-        /* Stili Admin Aggiuntivi */
-        .admin-item { background: #1a1a1c; padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 3px solid var(--primary); }
+        /* Stili Admin Aggiuntivi */ 
+        .admin-item { background: #1a1a1c; padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 3px solid var(--primary); } 
     </style> 
 </head> 
 <body> 
@@ -118,25 +118,25 @@
     <p style="font-size: 0.7rem; color: #555; text-align: center; margin-top: 20px;">Le offerte vengono aggiornate in tempo reale dall'ufficio commerciale.</p> 
 </div> 
 
-<div id="sedi" class="page">
-    <span class="category-label">Le Nostre Sedi</span>
-    <div class="auto-card" onclick="window.open('https://www.google.com/maps/search/?api=1&query=Contauto+Due+Teverola')">
-        <div class="auto-icon-circle">📍</div>
-        <div class="auto-info">
-            <h3 style="margin:0;">Teverola (CE)</h3>
-            <p style="font-size:0.7rem; color:#888;">S.S. 7 bis km 11.400 - Zona ASI</p>
-        </div>
-        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0818114111'">📞</button>
-    </div>
-    <div class="auto-card" onclick="window.open('https://www.google.com/maps/search/?api=1&query=Contauto+Due+San+Marco+Evangelista')">
-        <div class="auto-icon-circle">📍</div>
-        <div class="auto-info">
-            <h3 style="margin:0;">Caserta Sud</h3>
-            <p style="font-size:0.7rem; color:#888;">Via delle Industrie - S. Marco Ev.</p>
-        </div>
-        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0823123456'">📞</button>
-    </div>
-</div>
+<div id="sedi" class="page"> 
+    <span class="category-label">Le Nostre Sedi</span> 
+    <div class="auto-card" onclick="window.open('https://www.google.com/maps/search/?api=1&query=Contauto+Due+Teverola')"> 
+        <div class="auto-icon-circle">📍</div> 
+        <div class="auto-info"> 
+            <h3 style="margin:0;">Teverola (CE)</h3> 
+            <p style="font-size:0.7rem; color:#888;">S.S. 7 bis km 11.400 - Zona ASI</p> 
+        </div> 
+        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0818114111'">📞</button> 
+    </div> 
+    <div class="auto-card" onclick="window.open('https://www.google.com/maps/search/?api=1&query=Contauto+Due+San+Marco+Evangelista')"> 
+        <div class="auto-icon-circle">📍</div> 
+        <div class="auto-info"> 
+            <h3 style="margin:0;">Caserta Sud</h3> 
+            <p style="font-size:0.7rem; color:#888;">Via delle Industrie - S. Marco Ev.</p> 
+        </div> 
+        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0823123456'">📞</button> 
+    </div> 
+</div> 
 
 <div id="service" class="page"> 
     <span class="category-label">Calcolatori Efficienza</span> 
@@ -157,37 +157,37 @@
     </div> 
 </div> 
 
-<div id="admin" class="page">
-    <span class="category-label">Accesso Riservato Staff</span>
-    <div id="admin-auth" class="auth-container">
-        <p style="font-size: 0.8rem; color: #888; text-align: center; margin-bottom: 15px;">Inserisci il PIN per gestire il listino.</p>
-        <input type="password" id="admin-pin-field" class="input-std" placeholder="PIN ADMIN">
-        <button class="btn-full btn-primary" style="background: var(--promo);" onclick="unlockAdmin()">ACCEDI AL PANNELLO</button>
-    </div>
+<div id="admin" class="page"> 
+    <span class="category-label">Accesso Riservato Staff</span> 
+    <div id="admin-auth" class="auth-container"> 
+        <p style="font-size: 0.8rem; color: #888; text-align: center; margin-bottom: 15px;">Inserisci il PIN per gestire il listino.</p> 
+        <input type="password" id="admin-pin-field" class="input-std" placeholder="PIN ADMIN"> 
+        <button class="btn-full btn-primary" style="background: var(--promo);" onclick="unlockAdmin()">ACCEDI AL PANNELLO</button> 
+    </div> 
 
-    <div id="admin-dashboard" style="display:none;">
-        <div style="background: var(--promo); padding: 10px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
-            <h3 style="margin:0; font-size: 0.8rem;">GESTIONE HUB ATTIVA</h3>
-        </div>
-        
-        <span class="category-label">Nuova Promo / Elimina Esistenti</span>
-        <div class="ai-section">
-            <input type="text" id="adm-brand" class="input-std" placeholder="Brand (es. LEAPMOTOR)">
-            <input type="text" id="adm-model" class="input-std" placeholder="Modello">
-            <input type="text" id="adm-offer" class="input-std" placeholder="Offerta (es. € 149/mese)">
-            <input type="text" id="adm-tag" class="input-std" placeholder="Tag (es. SOTTOCOSTO)">
-            <button class="btn-full btn-primary" onclick="adminPublish()">PUBBLICA ORA</button>
-        </div>
-        <div id="admin-promo-manage-list"></div>
+    <div id="admin-dashboard" style="display:none;"> 
+        <div style="background: var(--promo); padding: 10px; border-radius: 12px; text-align: center; margin-bottom: 20px;"> 
+            <h3 style="margin:0; font-size: 0.8rem;">GESTIONE HUB ATTIVA</h3> 
+        </div> 
+         
+        <span class="category-label">Nuova Promo / Elimina Esistenti</span> 
+        <div class="ai-section"> 
+            <input type="text" id="adm-brand" class="input-std" placeholder="Brand (es. LEAPMOTOR)"> 
+            <input type="text" id="adm-model" class="input-std" placeholder="Modello"> 
+            <input type="text" id="adm-offer" class="input-std" placeholder="Offerta (es. € 149/mese)"> 
+            <input type="text" id="adm-tag" class="input-std" placeholder="Tag (es. SOTTOCOSTO)"> 
+            <button class="btn-full btn-primary" onclick="adminPublish()">PUBBLICA ORA</button> 
+        </div> 
+        <div id="admin-promo-manage-list"></div> 
 
-        <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+        <hr style="border:0; border-top:1px solid #333; margin:20px 0;"> 
 
-        <span class="category-label">Richieste Valutazione Usato</span>
-        <div id="admin-leads-list"></div>
+        <span class="category-label">Richieste Valutazione Usato</span> 
+        <div id="admin-leads-list"></div> 
 
-        <button class="btn-full btn-outline" onclick="location.reload()">CHIUDI SESSIONE</button>
-    </div>
-</div>
+        <button class="btn-full btn-outline" onclick="location.reload()">CHIUDI SESSIONE</button> 
+    </div> 
+</div> 
 
 <div id="profilo" class="page"> 
     <div id="auth-screen"> 
@@ -251,8 +251,8 @@
 <script> 
     let userName = ""; 
     let userEmail = ""; 
-    const MASTER_PIN = "1234";
-    let leadValutazioni = []; // Array per memorizzare le richieste di valutazione
+    const MASTER_PIN = "1234"; 
+    let leadValutazioni = []; 
 
     // DATABASE PROMOZIONI 
     let adminPromos = [ 
@@ -356,17 +356,16 @@
                 </div> 
             `; 
         }); 
-
         renderPromos(); 
     } 
 
     function renderPromos() { 
         const promoHome = document.getElementById('promo-home-list'); 
         const promoFull = document.getElementById('full-promo-list'); 
-        const adminManage = document.getElementById('admin-promo-manage-list');
+        const adminManage = document.getElementById('admin-promo-manage-list'); 
         
         let promoHTML = ""; 
-        let adminHTML = "";
+        let adminHTML = ""; 
 
         adminPromos.forEach(p => { 
             const card = ` 
@@ -379,34 +378,33 @@
                     </div> 
                 </div> 
             `; 
-            promoHTML += card;
-            adminHTML += `
-                <div class="auto-card" style="padding:10px; border-color:var(--promo);">
-                    <div class="auto-info" style="font-size:0.8rem;"><b>${p.brand}</b> - ${p.model}</div>
-                    <button onclick="adminDeletePromo(${p.id})" style="background:var(--promo); color:white; border:none; padding:5px 10px; border-radius:8px; font-size:0.7rem;">ELIMINA</button>
-                </div>
-            `;
+            promoHTML += card; 
+            adminHTML += ` 
+                <div class="auto-card" style="padding:10px; border-color:var(--promo);"> 
+                    <div class="auto-info" style="font-size:0.8rem;"><b>${p.brand}</b> - ${p.model}</div> 
+                    <button onclick="adminDeletePromo(${p.id})" style="background:var(--promo); color:white; border:none; padding:5px 10px; border-radius:8px; font-size:0.7rem;">ELIMINA</button> 
+                </div> 
+            `; 
         }); 
         promoHome.innerHTML = promoHTML; 
         promoFull.innerHTML = promoHTML; 
-        if(adminManage) adminManage.innerHTML = adminHTML;
+        if(adminManage) adminManage.innerHTML = adminHTML; 
     } 
 
-    function adminDeletePromo(id) {
-        if(confirm("Eliminare questa promozione?")) {
-            adminPromos = adminPromos.filter(p => p.id !== id);
-            renderPromos();
-        }
-    }
+    function adminDeletePromo(id) { 
+        if(confirm("Eliminare questa promozione?")) { 
+            adminPromos = adminPromos.filter(p => p.id !== id); 
+            renderPromos(); 
+        } 
+    } 
 
-    // LOGICA ADMIN 
     function unlockAdmin() { 
         const pin = document.getElementById('admin-pin-field').value; 
         if(pin === MASTER_PIN) { 
             document.getElementById('admin-auth').style.display = 'none'; 
             document.getElementById('admin-dashboard').style.display = 'block'; 
-            renderPromos();
-            renderAdminLeads();
+            renderPromos(); 
+            renderAdminLeads(); 
         } else { 
             alert("PIN Errato!"); 
         } 
@@ -417,13 +415,10 @@
         const m = document.getElementById('adm-model').value; 
         const o = document.getElementById('adm-offer').value; 
         const t = document.getElementById('adm-tag').value.toUpperCase(); 
-
         if(!b || !m || !o) return alert("Compila i campi principali!"); 
-
         adminPromos.unshift({ 
             id: Date.now(), brand: b, model: m, offer: o, tag: t || "PROMO", date: "Aggiornato ora" 
         }); 
-
         renderPromos(); 
         alert("Offerta pubblicata con successo!"); 
         document.getElementById('adm-brand').value = ""; 
@@ -431,24 +426,24 @@
         document.getElementById('adm-offer').value = ""; 
     } 
 
-    function renderAdminLeads() {
-        const list = document.getElementById('admin-leads-list');
-        if(!list) return;
-        list.innerHTML = leadValutazioni.map((l, index) => `
-            <div class="admin-item">
-                <div style="font-size:0.8rem;">
-                    <b>Modello:</b> ${l.modello}<br>
-                    <b>KM:</b> ${l.km}<br>
-                    <small>Ricevuta da: ${l.user || "Ospite"}</small>
-                </div>
-                <button onclick="respondToLead(${index})" class="btn-full btn-primary" style="padding:5px; font-size:0.7rem; margin-top:5px;">RISPONDI AL CLIENTE</button>
-            </div>
-        `).join('') || "<p style='font-size:0.7rem; color:#555;'>Nessuna richiesta pendente.</p>";
-    }
+    function renderAdminLeads() { 
+        const list = document.getElementById('admin-leads-list'); 
+        if(!list) return; 
+        list.innerHTML = leadValutazioni.map((l, index) => ` 
+            <div class="admin-item"> 
+                <div style="font-size:0.8rem;"> 
+                    <b>Modello:</b> ${l.modello}<br> 
+                    <b>KM:</b> ${l.km}<br> 
+                    <small>Ricevuta da: ${l.user || "Ospite"}</small> 
+                </div> 
+                <button onclick="respondToLead(${index})" class="btn-full btn-primary" style="padding:5px; font-size:0.7rem; margin-top:5px;">RISPONDI AL CLIENTE</button> 
+            </div> 
+        `).join('') || "<p style='font-size:0.7rem; color:#555;'>Nessuna richiesta pendente.</p>"; 
+    } 
 
-    function respondToLead(index) {
-        alert("Sistema di risposta attivato per: " + leadValutazioni[index].modello + ". Il cliente riceverà una notifica.");
-    }
+    function respondToLead(index) { 
+        alert("Sistema di risposta attivato per: " + leadValutazioni[index].modello + ". Il cliente riceverà una notifica."); 
+    } 
 
     function doLogin() {  
         const n = document.getElementById('u-nome').value;  
@@ -466,13 +461,10 @@
         const mod = document.getElementById('v-modello').value;  
         const km = document.getElementById('v-km').value;  
         if(!mod || !km) return alert("Inserisci i dati!");  
-        
-        // Salva la richiesta per l'admin
-        leadValutazioni.push({ modello: mod, km: km, user: userName || "Anonimo" });
-        
+        leadValutazioni.push({ modello: mod, km: km, user: userName || "Anonimo" }); 
         alert("Dati inviati all'amministrazione Contauto Due.");  
-        document.getElementById('v-modello').value = "";
-        document.getElementById('v-km').value = "";
+        document.getElementById('v-modello').value = ""; 
+        document.getElementById('v-km').value = ""; 
     }  
 
     function switchPage(pageId, btn) {  
@@ -480,10 +472,10 @@
         document.getElementById(pageId).classList.add('active');  
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));  
         btn.classList.add('active');  
-        if(pageId === 'admin' && document.getElementById('admin-dashboard').style.display === 'block') {
-            renderPromos();
-            renderAdminLeads();
-        }
+        if(pageId === 'admin' && document.getElementById('admin-dashboard').style.display === 'block') { 
+            renderPromos(); 
+            renderAdminLeads(); 
+        } 
     }  
 
     function calcEco() {  
@@ -510,24 +502,18 @@
         const win = document.getElementById('chat-window');  
         const text = input.value.trim();  
         if(!text) return;  
-          
         win.innerHTML += `<div class="bubble user">${text}</div>`;  
         const q = text.toLowerCase();  
         input.value = "";  
-
         let response = "";  
         const intro = userName ? `${userName}, ` : "";  
-
         const isFamily = q.includes("famiglia") || q.includes("spazio") || q.includes("figli");  
         const isElectric = q.includes("elettrica") || q.includes("batteria") || q.includes("autonomia");  
         const isOffer = q.includes("offerta") || q.includes("promozione") || q.includes("sconto");  
-
         let brandKey = Object.keys(technicalDB).find(b => q.includes(b));  
-
         if (brandKey) {  
             const data = technicalDB[brandKey];  
             let modelKey = Object.keys(data.models).find(m => q.includes(m));  
-              
             if (modelKey) {  
                 response = `${intro}La **${brandKey.toUpperCase()} ${modelKey.toUpperCase()}** è un'ottima scelta. ${data.models[modelKey]} Vuoi approfondire l'allestimento?`;  
             } else {  
@@ -546,7 +532,6 @@
         else {  
             response = `${intro}come esperto tecnico, posso aiutarti su Peugeot, BYD, Skoda, Leapmotor, Jaecoo, Omoda, Changan e Citroen. Cosa cerchi oggi?`;  
         }  
-
         setTimeout(() => addBotMessage(response), 600);  
     }  
 
