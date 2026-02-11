@@ -90,10 +90,10 @@
     <span class="category-label">Consulente Digitale Contauto</span>
     <div class="ai-section">
         <div id="chat-window">
-            <div class="bubble bot">Ciao! Sono il sistema intelligente di Contauto Due. Iniziamo con il tuo nome per offrirti un'esperienza su misura?</div>
+            <div class="bubble bot">Buongiorno. Sono l'intelligenza di supporto Contauto Due. Inserisci il tuo nome per iniziare una sessione di consulenza su misura.</div>
         </div>
         <div class="chat-input-wrap">
-            <input type="text" id="ai-input" placeholder="Scrivi qui la tua domanda...">
+            <input type="text" id="ai-input" placeholder="Parliamo di design ed efficienza...">
             <button class="send-btn" onclick="processAI()">OK</button>
         </div>
     </div>
@@ -116,8 +116,9 @@
     <span class="category-label">Valutazione Usato</span>
     <div class="auto-card" style="flex-direction: column; align-items: flex-start; padding: 20px; border-color: var(--accent);">
         <span class="badge" style="color:var(--accent);">Stima Valore</span>
-        <input type="text" placeholder="Marca, Modello e Anno" class="input-std">
-        <button class="btn-full btn-outline" onclick="alert('I periti analizzeranno i dati!')">STIMA VALORE</button>
+        <input type="text" id="v-modello" placeholder="Marca, Modello e Anno" class="input-std">
+        <input type="number" id="v-km" placeholder="Chilometri attuali" class="input-std">
+        <button class="btn-full btn-outline" onclick="sendValutazione()">INVIA ALL'AMMINISTRAZIONE</button>
     </div>
 </div>
 
@@ -131,15 +132,6 @@
             <p style="font-size: 0.7rem; color: #888;">S.S. 7 bis km 11.400 - Zona ASI</p>
         </div>
         <button class="send-btn" onclick="window.location.href='tel:0818114111'">📞</button>
-    </div>
-    <div class="auto-card">
-        <div class="auto-icon-circle">📍</div>
-        <div class="auto-info">
-            <span class="badge">Sede Caserta Nord</span>
-            <h3 style="margin:0;">San Marco Evangelista</h3>
-            <p style="font-size: 0.7rem; color: #888;">S.P. 335 - Uscita San Marco</p>
-        </div>
-        <button class="send-btn" onclick="window.location.href='tel:0823123456'">📞</button>
     </div>
 </div>
 
@@ -222,7 +214,6 @@
                         <h3 style="margin:0; font-size:1rem;">${car.model}</h3>
                         <div class="price">${car.price}</div>
                     </div>
-                    <button style="background:none; border:none; color:var(--primary); font-size:1.2rem; cursor:pointer;">→</button>
                 </div>
             `;
         });
@@ -230,25 +221,39 @@
 
     function doLogin() {
         const n = document.getElementById('u-nome').value;
-        const c = document.getElementById('u-cognome').value;
         const e = document.getElementById('u-email').value;
-        const p = document.getElementById('u-pass').value;
-
-        if(!n || !c || !e.includes('@') || p.length < 4) {
-            alert("Compila tutti i campi correttamente!");
-            return;
-        }
-
+        if(!n || !e.includes('@')) return alert("Dati incompleti!");
         userName = n;
         userEmail = e;
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('logged-screen').style.display = 'block';
-        document.getElementById('profile-display-name').innerText = n + " " + c;
+        document.getElementById('profile-display-name').innerText = n;
         document.getElementById('profile-display-email').innerText = e;
         
-        const win = document.getElementById('chat-window');
-        win.innerHTML += `<div class="bubble bot">Benvenuto nel club Contauto Due, <b>${n}</b>! Ho attivato il sistema di avvisi sulla tua email. Di cosa parliamo oggi?</div>`;
-        win.scrollTop = win.scrollHeight;
+        addBotMessage(`Benvenuto, ${n}. Ho configurato il tuo profilo con email ${e}. Come posso aiutarti oggi?`);
+    }
+
+    function sendValutazione() {
+        const mod = document.getElementById('v-modello').value;
+        const km = document.getElementById('v-km').value;
+        if(!mod || !km) return alert("Inserisci i dati del veicolo!");
+
+        const requestData = {
+            cliente: userName || "Ospite",
+            email: userEmail || "Non fornita",
+            veicolo: mod,
+            chilometri: km,
+            timestamp: new Date().toISOString()
+        };
+
+        // Simulazione invio all'amministrazione
+        console.log("DATI INVIATI ALL'AMMINISTRAZIONE:", requestData);
+        
+        alert("Richiesta inviata all'amministrazione. Una notifica di conferma è stata inviata all'indirizzo: " + (userEmail || "email non registrata"));
+        
+        if(userEmail) {
+            addBotMessage(`Ho preso in carico la tua richiesta per la ${mod}. L'amministrazione la esaminerà a breve e riceverai un aggiornamento via email.`);
+        }
     }
 
     function switchPage(pageId, btn) {
@@ -256,14 +261,13 @@
         document.getElementById(pageId).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         btn.classList.add('active');
-        window.scrollTo(0,0);
     }
 
     function calcEco() {
         const km = document.getElementById('eco-km').value;
         if(!km) return;
         const saving = Math.round(km * 0.16); 
-        document.getElementById('eco-res').innerHTML = `Risparmio stimato: <span style="color:#fff">€${saving}</span> al mese con gamma Elettrica!`;
+        document.getElementById('eco-res').innerHTML = `Risparmio stimato: €${saving} al mese con gamma Elettrica!`;
     }
 
     function saveGarage() {
@@ -277,7 +281,12 @@
                     <p style="margin:0; font-size:0.8rem; color:var(--accent);">TARGA: ${t.toUpperCase()}</p>
                 </div>
             </div>`;
-        alert("Auto aggiunta! Riceverai avvisi email per questo veicolo.");
+    }
+
+    function addBotMessage(text) {
+        const win = document.getElementById('chat-window');
+        win.innerHTML += `<div class="bubble bot">${text}</div>`;
+        win.scrollTop = win.scrollHeight;
     }
 
     function processAI() {
@@ -290,26 +299,24 @@
         input.value = "";
 
         let response = "";
-        const greetings = ["Certamente " + (userName || "amico") + ", ", "Ottima domanda, ", "Ecco cosa so: ", "Guarda " + (userName || "") + ", "];
-        const prefix = greetings[Math.floor(Math.random()*greetings.length)];
+        const context = userName ? `Certamente ${userName}, ` : "";
 
         if (q.includes("peugeot")) {
-            response = prefix + "Peugeot è il nostro marchio storico. La Nuova 3008 Hybrid è disponibile per un test drive a Teverola.";
+            response = context + "Peugeot unisce design ed efficienza. La Nuova 3008 Hybrid è il punto di riferimento del segmento.";
         } else if (q.includes("byd")) {
-            response = prefix + "BYD Seal è pura tecnologia. Se vuoi, posso inviarti la scheda tecnica sulla tua email " + (userEmail || "non ancora registrata") + ".";
+            response = context + "BYD è leader globale. Le loro batterie Blade sono il massimo della sicurezza oggi disponibile.";
         } else if (q.includes("leapmotor")) {
-            response = prefix + "Leapmotor T03 è l'elettrica più intelligente della gamma. Ti avviserò via email appena avremo nuove promozioni.";
+            response = context + "Leapmotor offre un'efficienza urbana straordinaria. La T03 è la scelta più intelligente per la mobilità elettrica.";
+        } else if (q.includes("valuta") || q.includes("prezzo")) {
+            response = "Posso aiutarti con una stima. Vai nella sezione 'Tools' per inviare i dati all'amministrazione.";
         } else if (!userName && text.length > 2) {
             userName = text;
-            response = `Piacere di conoscerti ${userName}! Inserisci anche la tua email nel profilo per ricevere gli avvisi tecnici. Di quale auto vuoi parlare?`;
+            response = `Piacere di conoscerti ${userName}. In qualità di consulente Contauto Due, posso guidarti tra Peugeot, BYD, Leapmotor e altri brand d'eccellenza. Cosa cerchi in un'auto?`;
         } else {
-            response = prefix + "In Contauto Due trattiamo Peugeot, Citroen, Skoda, BYD, Omoda, Jaecoo, Leapmotor e Changan. Come posso aiutarti oggi?";
+            response = context + "In Contauto Due curiamo Peugeot, Citroen, Skoda, BYD, Omoda, Jaecoo, Leapmotor e Changan. Quale di questi brand ti interessa approfondire?";
         }
 
-        setTimeout(() => {
-            win.innerHTML += `<div class="bubble bot">${response}</div>`;
-            win.scrollTop = win.scrollHeight;
-        }, 600);
+        setTimeout(() => addBotMessage(response), 600);
     }
 
     initShowroom();
