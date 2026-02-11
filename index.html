@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contauto Due - Official App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #003366;
+            --accent-blue: #007AFF;
+            --bg-dark: #0a0a0a;
+            --card-bg: #1a1a1c;
+            --text-light: #ffffff;
+            --ai-bubble: #2c2c2e;
+            --success: #34c759;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-dark);
+            color: var(--text-light); margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Header e Branding */
+        header { 
+            width: 100%; padding: 20px 0; text-align: center; 
+            background: rgba(0,0,0,0.9); position: sticky; top: 0; 
+            z-index: 100; border-bottom: 1px solid #222; backdrop-filter: blur(10px);
+        }
+        header h1 { letter-spacing: 4px; font-size: 1.1rem; margin: 0; font-weight: 700; }
+
+        .container { width: 100%; max-width: 450px; padding: 15px; box-sizing: border-box; }
+
+        /* INTELLIGENZA ARTIFICIALE CHAT */
+        .ai-chat-box {
+            background: linear-gradient(145deg, #1e1e1e, #111);
+            border: 1px solid #333; border-radius: 20px; padding: 15px; margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .ai-status { width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
+        
+        #chat-display { height: 180px; overflow-y: auto; font-size: 0.85rem; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; scroll-behavior: smooth; }
+        .msg { padding: 10px 14px; border-radius: 15px; max-width: 85%; line-height: 1.4; }
+        .bot { background: var(--ai-bubble); align-self: flex-start; border-bottom-left-radius: 2px; }
+        .user { background: var(--accent-blue); align-self: flex-end; border-bottom-right-radius: 2px; }
+
+        .ai-input-area { display: flex; gap: 8px; }
+        .ai-input-area input { flex-grow: 1; background: #000; border: 1px solid #444; color: white; padding: 12px; border-radius: 12px; outline: none; }
+        .ai-send { background: var(--accent-blue); border: none; color: white; padding: 0 20px; border-radius: 12px; cursor: pointer; font-weight: bold; }
+
+        /* SELETTORE SEDI */
+        .sede-selector { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .sede-btn { white-space: nowrap; padding: 10px 20px; border: 1px solid #333; border-radius: 25px; background: #1c1c1e; color: #fff; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
+        .sede-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); box-shadow: 0 0 15px rgba(0, 122, 255, 0.4); }
+
+        /* SHOWROOM CARDS */
+        .auto-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; margin-bottom: 20px; border: 1px solid #2c2c2e; transition: transform 0.2s; }
+        .auto-card:active { transform: scale(0.98); }
+        .auto-image-placeholder { height: 160px; background: linear-gradient(45deg, #111, #222); display: flex; align-items: center; justify-content: center; color: #444; font-weight: bold; }
+        .auto-content { padding: 18px; }
+        .brand-badge { font-size: 0.65rem; color: var(--accent-blue); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+        .price-tag { color: var(--success); font-weight: 700; font-size: 1.2rem; margin-top: 8px; }
+
+        /* AZIONI RAPIDE */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
+        .action-item { background: #1c1c1e; padding: 15px; border-radius: 15px; text-align: center; text-decoration: none; color: white; border: 1px solid #333; font-size: 0.85rem; font-weight: 600; }
+        
+        /* NAVIGAZIONE */
+        nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; backdrop-filter: blur(15px); }
+        nav div { text-align: center; font-size: 0.7rem; color: #666; cursor: pointer; transition: 0.3s; }
+        nav div.active { color: var(--accent-blue); font-weight: bold; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <header><h1>CONTAUTO DUE</h1></header>
+
+    <div class="container">
+        
+        <div class="ai-chat-box">
+            <div class="ai-header">
+                <div class="ai-status"></div>
+                <span style="font-weight: 600; font-size: 0.75rem; letter-spacing: 1px;">AI ASSISTANT TOP DEALER</span>
+            </div>
+            <div id="chat-display">
+                <div class="msg bot">Benvenuto in Contauto Due! Sono l'IA ufficiale. Posso darti info sulle sedi di Teverola e San Marco o sui nostri marchi: Peugeot, Citroën, Skoda, Jaecoo, Omoda, Leapmotor, BYD e Changan.</div>
+            </div>
+            <div class="ai-input-area">
+                <input type="text" id="ai-input" placeholder="Chiedimi della sede o di un'auto...">
+                <button class="ai-send" onclick="askAI()">INVIA</button>
+            </div>
+        </div>
+
+        <div class="sede-selector">
+            <button class="sede-btn active" onclick="filterSede('Teverola')">📍 Sede Teverola</button>
+            <button class="sede-btn" onclick="filterSede('San Marco')">📍 Sede San Marco</button>
+            <button class="sede-btn" onclick="filterSede('all')">🌍 Tutte le Auto</button>
+        </div>
+
+        <div id="showroom"></div>
+
+        <h2 style="font-size: 0.9rem; margin: 25px 0 15px 5px; color: #888;">SERVIZI RAPIDI</h2>
+        <div class="action-grid">
+            <a href="https://wa.me/390818114111" class="action-item">💬 WhatsApp</a>
+            <div class="action-item" onclick="alert('Prenotazione Service aperta!')">🛠️ Officina</div>
+            <div class="action-item" onclick="alert('Ricerca Usato Spoticar...')">⭐ Usato</div>
+            <div class="action-item" onclick="window.location.href='tel:0818114111'">📞 Chiama</div>
+        </div>
+
+        <div style="height: 100px;"></div>
+    </div>
+
+    <nav>
+        <div class="active">🚗<br>Showroom</div>
+        <div onclick="alert('Sezione Service')">🔧<br>Service</div>
+        <div onclick="alert('Mappa Sedi')">📍<br>Sedi</div>
+        <div onclick="alert('Area Personale')">👤<br>Profilo</div>
+    </nav>
+
+    <script>
+        // Database dei Marchi e Veicoli (Efficienza JSON)
+        const autoData = [
+            { modello: "Nuova Peugeot 3008", marca: "Peugeot", sede: "Teverola", prezzo: "Da €34.900", tag: "NUOVO" },
+            { modello: "Skoda Enyaq iV", marca: "Skoda", sede: "San Marco", prezzo: "Elettrico", tag: "ECO" },
+            { modello: "Jaecoo 7 SUV", marca: "Jaecoo", sede: "Teverola", prezzo: "Top di Gamma", tag: "PREMIUM" },
+            { modello: "BYD Seal", marca: "BYD", sede: "Teverola", prezzo: "Incentivi", tag: "FULL ELECTRIC" },
+            { modello: "Citroën C3 Max", marca: "Citroën", sede: "San Marco", prezzo: "Da €149/mese", tag: "OFFERTA" },
+            { modello: "Omoda 5", marca: "Omoda", sede: "Teverola", prezzo: "Pronta Consegna", tag: "DESIGN" },
+            { modello: "Leapmotor T03", marca: "Leapmotor", sede: "San Marco", prezzo: "City Car", tag: "URBAN" },
+            { modello: "Changan Uni-K", marca: "Changan", sede: "San Marco", prezzo: "Richiedi Prezzo", tag: "NEW ARRIVAL" }
+        ];
+
+        function renderAuto(filter = 'Teverola') {
+            const container = document.getElementById('showroom');
+            container.innerHTML = '';
+            const filtered = autoData.filter(a => a.sede.includes(filter) || filter === 'all');
+            
+            filtered.forEach(auto => {
+                container.innerHTML += `
+                    <div class="auto-card">
+                        <div class="auto-image-placeholder">${auto.marca.toUpperCase()}</div>
+                        <div class="auto-content">
+                            <span class="brand-badge">${auto.marca} • ${auto.tag}</span>
+                            <h3 style="margin:8px 0 5px 0; font-size:1.1rem;">${auto.modello}</h3>
+                            <div style="font-size:0.8rem; color:#888;">Disponibile a: ${auto.sede}</div>
+                            <div class="price-tag">${auto.prezzo}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function askAI() {
+            const input = document.getElementById('ai-input');
+            const display = document.getElementById('chat-display');
+            if(!input.value) return;
+
+            display.innerHTML += `<div class="msg user">${input.value}</div>`;
+            const q = input.value.toLowerCase();
+            let resp = "Siamo Top Dealer per Peugeot, Citroën, Skoda, Jaecoo, Omoda, Leapmotor, BYD e Changan. Vuoi info su un marchio o sulle sedi?";
+
+            if(q.includes("teverola")) resp = "La sede di Teverola si trova sulla S.S. 7 bis. È il nostro hub principale per Peugeot, BYD, Omoda e Jaecoo.";
+            else if(q.includes("san marco")) resp = "La sede di San Marco Evangelista è sulla S.P. 335. Lì trovi Skoda, Citroën, Leapmotor e Changan.";
+            else if(q.includes("skoda")) resp = "Skoda è sinonimo di qualità. Abbiamo tutta la gamma, dai SUV alle berline, a San Marco Evangelista.";
+            else if(q.includes("byd") || q.includes("elettrica")) resp = "Siamo specialisti BYD! Vieni a Teverola per scoprire la Seal o la Atto 3 e sfruttare gli incentivi.";
+            else if(q.includes("jaecoo") || q.includes("omoda")) resp = "Jaecoo e Omoda sono i nuovi brand di design futuristico disponibili ora nella sede di Teverola!";
+            else if(q.includes("changan") || q.includes("leapmotor")) resp = "Leapmotor e Changan sono le novità per la mobilità smart ed elettrica. Chiedimi un test drive!";
+            else if(q.includes("peugeot") || q.includes("citroen")) resp = "Peugeot e Citroën sono i nostri pilastri. Abbiamo offerte imbattibili su tutta la gamma in entrambe le sedi.";
+
+            setTimeout(() => {
+                display.innerHTML += `<div class="msg bot">${resp}</div>`;
+                display.scrollTop = display.scrollHeight;
+            }, 600);
+
+            input.value = '';
+            display.scrollTop = display.scrollHeight;
+        }
+
+        function filterSede(sede) {
+            document.querySelectorAll('.sede-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(sede === 'all' && btn.innerText.includes('Tutte')) btn.classList.add('active');
+                else if(btn.innerText.includes(sede)) btn.classList.add('active');
+            });
+            renderAuto(sede);
+        }
+
+        // Avvio iniziale
+        renderAuto('Teverola');
+    </script>
+</body>
+</html>
