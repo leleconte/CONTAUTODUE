@@ -1,445 +1,434 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Contauto Due | Official Digital Hub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #0066ff;
-            --bg: #050505;
-            --card: #121214;
-            --text: #ffffff;
-            --accent: #00f2ff;
-            --glass: rgba(255, 255, 255, 0.05);
-            --success: #00ff88;
-            --promo: #ff3e3e; /* Colore aggiunto per le promo */
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); 
-            color: var(--text); margin: 0; padding: 0; overflow-x: hidden;
-        }
-
-        /* Navigazione Schermate */
-        .page { display: none; width: 100%; max-width: 450px; margin: 0 auto; padding: 20px; animation: fadeIn 0.3s ease; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Header */
-        header { 
-            position: sticky; top: 0; z-index: 1000; background: rgba(5,5,5,0.8);
-            backdrop-filter: blur(15px); padding: 15px; border-bottom: 1px solid var(--glass);
-            text-align: center;
-        }
-        .logo-text { font-weight: 800; letter-spacing: 2px; font-size: 1.1rem; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* Categorie e Header Sezioni */
-        .category-label { font-size: 0.7rem; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px; display: block; }
-
-        /* IA Chat Premium */
-        .ai-section { background: var(--glass); border: 1px solid var(--glass); border-radius: 24px; padding: 15px; margin-bottom: 20px; border-top: 2px solid var(--primary); }
-        #chat-window { height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding: 5px; scroll-behavior: smooth; }
-        .bubble { padding: 10px 14px; border-radius: 18px; font-size: 0.85rem; max-width: 85%; line-height: 1.4; position: relative; }
-        .bot { background: #222; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #333; }
-        .user { background: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(0,102,255,0.2); }
-        
-        .chat-input-wrap { display: flex; gap: 10px; background: #000; padding: 8px; border-radius: 16px; border: 1px solid #333; }
-        .chat-input-wrap input { flex: 1; background: transparent; border: none; color: #fff; padding: 5px 10px; outline: none; }
-        .send-btn { background: var(--primary); border: none; border-radius: 12px; color: white; padding: 8px 15px; font-weight: bold; cursor: pointer; }
-
-        /* Card Auto & Promo */
-        .auto-card { background: var(--card); border-radius: 20px; margin-bottom: 12px; border: 1px solid var(--glass); display: flex; align-items: center; padding: 15px; gap: 15px; transition: 0.3s; }
-        .auto-card:active { transform: scale(0.98); background: #1a1a1c; }
-        .promo-card { border-left: 4px solid var(--promo); background: linear-gradient(90deg, #1a0a0a, #121214); }
-        .auto-icon-circle { width: 45px; height: 45px; background: var(--glass); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; border: 1px solid #333; }
-        .auto-info { flex: 1; }
-        .badge { font-size: 0.6rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 2px; display: block; }
-        .price { font-size: 1.1rem; font-weight: 800; color: var(--success); }
-        .promo-tag { background: var(--promo); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.55rem; font-weight: 900; margin-left: 5px; }
-
-        /* Eco Calculator Box */
-        .eco-box { background: linear-gradient(135deg, #001a33, #000); border: 1px solid var(--primary); border-radius: 20px; padding: 18px; margin-bottom: 20px; }
-
-        /* Menu Inferiore */
-        nav { 
-            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.95);
-            backdrop-filter: blur(20px); display: flex; justify-content: space-around;
-            padding: 12px 0 25px; border-top: 1px solid var(--glass); z-index: 1000;
-        }
-        .nav-item { border: none; background: none; color: #555; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; transition: 0.3s; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item svg { width: 22px; height: 22px; }
-
-        /* Elementi Generici */
-        .btn-full { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: transparent; border: 1px solid #333; color: white; }
-        .input-std { width:100%; padding:12px; border-radius:8px; background:#000; border:1px solid #333; color:#fff; margin-bottom:10px; font-family: inherit; }
-        
-        /* Stile Auth */
-        .auth-container { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--glass); margin-top: 10px; }
-    </style>
-</head>
-<body>
-
-<header>
-    <div class="logo-text">CONTAUTO DUE</div>
-</header>
-
-<div id="showroom" class="page active">
-    <span class="category-label">Technical Expert Contauto</span>
-    <div class="ai-section">
-        <div id="chat-window">
-            <div class="bubble bot">Buongiorno. Sono l'intelligenza tecnica di Contauto Due. Conosco ogni dettaglio dei marchi Peugeot, Citroen, Skoda, Jaecoo, Omoda, Leapmotor, BYD e Changan. Dimmi il tuo nome.</div>
-        </div>
-        <div class="chat-input-wrap">
-            <input type="text" id="ai-input" placeholder="Chiedimi di qualsiasi marchio o modello...">
-            <button class="send-btn" onclick="processAI()">OK</button>
-        </div>
-    </div>
-
-    <span class="category-label">Promozioni Attive (Admin Panel)</span>
-    <div id="promo-home-list"></div>
-
-    <span class="category-label">Vetrina Modelli Rapida</span>
-    <div id="car-list"></div>
-    <div style="height: 80px;"></div>
-</div>
-
-<div id="offerte" class="page">
-    <span class="category-label">Tutte le Offerte Speciali</span>
-    <div id="full-promo-list"></div>
-    <p style="font-size: 0.7rem; color: #555; text-align: center; margin-top: 20px;">Le offerte vengono aggiornate in tempo reale dall'ufficio commerciale.</p>
-</div>
-
-<div id="service" class="page">
-    <span class="category-label">Calcolatori Efficienza</span>
-    <div class="eco-box">
-        <h4 style="margin:0 0 10px 0; font-size:0.85rem; color:var(--accent);">⚡ ECO-CALCULATOR</h4>
-        <p style="font-size:0.75rem; color:#aaa; margin-bottom:12px;">Confronta subito il tuo risparmio passando all'elettrico.</p>
-        <input type="number" id="eco-km" class="input-std" placeholder="Km percorsi ogni mese">
-        <button class="btn-full btn-primary" style="padding:10px; font-size:0.8rem;" onclick="calcEco()">CALCOLA IL RISPARMIO</button>
-        <div id="eco-res" style="margin-top:10px; font-size:0.85rem; color:var(--success); font-weight:600; text-align:center;"></div>
-    </div>
-
-    <span class="category-label">Valutazione Usato</span>
-    <div class="auto-card" style="flex-direction: column; align-items: flex-start; padding: 20px; border-color: var(--accent);">
-        <span class="badge" style="color:var(--accent);">Stima Valore</span>
-        <input type="text" id="v-modello" placeholder="Marca, Modello e Anno" class="input-std">
-        <input type="number" id="v-km" placeholder="Chilometri attuali" class="input-std">
-        <button class="btn-full btn-outline" onclick="sendValutazione()">INVIA ALL'AMMINISTRAZIONE</button>
-    </div>
-</div>
-
-<div id="sedi" class="page">
-    <span class="category-label">Le nostre sedi ufficiali</span>
-    <div class="auto-card" onclick="window.open('https://maps.google.com/?q=Contauto+Due+Teverola', '_blank')" style="cursor:pointer;">
-        <div class="auto-icon-circle">📍</div>
-        <div class="auto-info">
-            <span class="badge">Sede Principale</span>
-            <h3 style="margin:0;">Teverola</h3>
-            <p style="font-size: 0.7rem; color: #888;">S.S. 7 bis km 11.400 - Zona ASI</p>
-        </div>
-        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0818114111'">📞</button>
-    </div>
-
-    <div class="auto-card" onclick="window.open('https://maps.google.com/?q=Contauto+Due+San+Marco+Evangelista', '_blank')" style="cursor:pointer;">
-        <div class="auto-icon-circle">📍</div>
-        <div class="auto-info">
-            <span class="badge">Sede Secondaria</span>
-            <h3 style="margin:0;">San Marco Evangelista</h3>
-            <p style="font-size: 0.7rem; color: #888;">Via delle Industrie - San Marco Evangelista</p>
-        </div>
-        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0823123456'">📞</button>
-    </div>
-</div>
-
-<div id="profilo" class="page">
-    <div id="auth-screen">
-        <div style="text-align: center; padding: 20px 0;">
-            <div style="width: 70px; height: 70px; background: var(--primary); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">👤</div>
-            <h3>Profilo Unico</h3>
-            <p style="color: #666; font-size: 0.8rem;">Accedi per attivare gli avvisi email personalizzati.</p>
-        </div>
-
-        <div class="auth-container">
-            <input type="text" id="u-nome" class="input-std" placeholder="Nome">
-            <input type="text" id="u-cognome" class="input-std" placeholder="Cognome">
-            <input type="email" id="u-email" class="input-std" placeholder="Email (per avvisi)">
-            <input type="password" id="u-pass" class="input-std" placeholder="Password">
-            <button class="btn-full btn-primary" onclick="doLogin()">ATTIVA ACCOUNT</button>
-        </div>
-    </div>
-
-    <div id="logged-screen" style="display:none;">
-        <div style="text-align: center; padding: 20px 0;">
-            <div style="width: 70px; height: 70px; background: var(--success); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">✅</div>
-            <h3 id="profile-display-name">Digital Garage</h3>
-            <p id="profile-display-email" style="color: var(--accent); font-size: 0.8rem;"></p>
-        </div>
-
-        <span class="category-label">Aggiungi veicolo</span>
-        <div class="auto-card" style="flex-direction:column; padding:20px;">
-            <input type="text" id="g-model" class="input-std" placeholder="Modello Auto">
-            <input type="text" id="g-plate" class="input-std" placeholder="Targa">
-            <button class="btn-full btn-primary" onclick="saveGarage()">SALVA NEL GARAGE</button>
-        </div>
-        
-        <div id="garage-display"></div>
-        <button class="btn-full btn-outline" style="margin-top:20px;" onclick="location.reload()">LOGOUT</button>
-    </div>
-</div>
-
-<nav>
-    <button class="nav-item active" onclick="switchPage('showroom', this)">
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/></svg>
-        <span>Auto</span>
-    </button>
-    <button class="nav-item" onclick="switchPage('offerte', this)">
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.42-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
-        <span>Promo</span>
-    </button>
-    <button class="nav-item" onclick="switchPage('service', this)">
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.5 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
-        <span>Tools</span>
-    </button>
-    <button class="nav-item" onclick="switchPage('profilo', this)">
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        <span>Profilo</span>
-    </button>
-</nav>
-
-<script>
-    let userName = "";
-    let userEmail = "";
-
-    // DATABASE PROMOZIONI (Simulato - Da collegare al futuro pannello admin)
-    const adminPromos = [
-        { brand: "PEUGEOT", model: "Nuova 208 Hybrid", offer: "Tua da € 149/mese", tag: "SOTTOCOSTO", date: "Scade 28/02" },
-        { brand: "BYD", model: "Atto 3 Elettrica", offer: "EcoBonus + Wallbox Gratis", tag: "GREEN", date: "Scade 15/03" },
-        { brand: "SKODA", model: "Kodiaq", offer: "Manutenzione 4 anni inclusa", tag: "FAMILY", date: "Offerta Limitata" }
-    ];
-
-    const technicalDB = {
-        peugeot: {
-            desc: "Design graffiante (Artiglio del Leone) e interni rivoluzionari i-Cockpit®.",
-            focus: "estetica futuristica e piacere di guida",
-            models: {
-                "208": "Disponibile Benzina, Hybrid (100/136 CV) o E-208 100% elettrica (fino a 410km WLTP).",
-                "2008": "SUV compatto. Versioni termiche o E-2008 elettrica. Design muscoloso e tech ADAS.",
-                "3008": "Nuovo SUV Fastback. Motorizzazione Hybrid 48V o E-3008 (fino a 700km di autonomia).",
-                "408": "La 'Dynamic Fastback'. Plug-in Hybrid da 180 o 225 CV. Design unico e aerodinamico.",
-                "5008": "Il grande SUV a 7 posti. Spazio infinito e tecnologia di vertice."
-            }
-        },
-        citroen: {
-            desc: "Focus assoluto sul Comfort con sospensioni Progressive Hydraulic Cushions®.",
-            focus: "comodità di marcia e versatilità",
-            models: {
-                "c3": "Nuova generazione. Anche 100% elettrica (ë-C3). Comfort e accessibilità.",
-                "c3 aircross": "SUV versatile e spazioso, ideale per la famiglia.",
-                "c4": "Design crossover, comfort 'Advanced Comfort' unico. Anche 100% elettrica.",
-                "c5 aircross": "Il SUV più comodo del segmento, disponibile Plug-in Hybrid.",
-                "ami": "La soluzione di micro-mobilità 100% elettrica urbana."
-            }
-        },
-        skoda: {
-            desc: "Filosofia 'Simply Clever': spazio intelligente, praticità e solidità costruttiva.",
-            focus: "spazio interno e soluzioni pratiche 'Simply Clever'",
-            models: {
-                "fabia": "La compatta tecnologica con motori TSI efficienti.",
-                "kamiq": "City SUV di successo. Ergonomia perfetta e ottima connettività.",
-                "karoq": "SUV robusto e versatile per ogni tipo di terreno.",
-                "kodiaq": "Il SUV ammiraglia a 7 posti. Motori TDI EVO o nuovo Plug-in (100km EV).",
-                "octavia": "Icona di spazio e comfort (Wagon o Berlina). Versioni Hybrid e Metano.",
-                "enyaq": "Il SUV elettrico puro di Skoda. Fino a 560km di autonomia e ricarica ultra-rapida."
-            }
-        },
-        byd: {
-            desc: "Leader mondiale NEV con l'esclusiva Blade Battery (sicura ed efficiente).",
-            focus: "tecnologia delle batterie e prestazioni elettriche",
-            models: {
-                "dolphin": "Hatchback elettrica di segmento C, agile e sicura (427km WLTP).",
-                "atto 3": "SUV elettrico tech, interni futuristici e Blade Battery da 60 kWh.",
-                "seal": "Berlina sportiva 530 CV (AWD), 0-100 in 3.8s, tecnologia Cell-to-Body.",
-                "han": "Ammiraglia elettrica di lusso, prestazioni e rifiniture premium.",
-                "tang": "SUV 7 posti elettrico ad alte prestazioni."
-            }
-        },
-        leapmotor: {
-            desc: "Mobilità elettrica intelligente e democratica, partnership con Stellantis.",
-            focus: "elettrico accessibile e tecnologico",
-            models: {
-                "t03": "City car elettrica 5 porte. Batteria 41.3 kWh, 280km autonomia, ADAS di livello 2.",
-                "c10": "SUV familiare elettrico moderno, focus su sicurezza e connettività."
-            }
-        },
-        jaecoo: {
-            desc: "Nuovo brand di lusso specializzato in SUV con attitudine Off-Road.",
-            focus: "lusso off-road e robustezza elegante",
-            models: {
-                "j7": "SUV 4x4 intelligente. Motore 1.6 TGDI 197 CV, interni minimal e display 14.8 pollici."
-            }
-        },
-        omoda: {
-            desc: "Design futuristico (Art in Motion) e tecnologia ADAS di serie completa.",
-            focus: "stile all'avanguardia e sicurezza",
-            models: {
-                "omoda 5": "Crossover sportivo 1.6 Turbo 147 CV o versione elettrica Omoda 5 EV."
-            }
-        },
-        changan: {
-            desc: "Uno dei colossi dell'innovazione asiatica, qualità costruttiva impeccabile.",
-            focus: "innovazione e alta qualità costruttiva",
-            models: {
-                "deepal s07": "SUV elettrico dal design futuristico e tecnologia AI avanzata."
-            }
-        }
-    };
-
-    const cars = [
-        { brand: "Peugeot", model: "Nuova 3008 Hybrid", price: "€ 38.700", icon: "🦁" },
-        { brand: "BYD", model: "Seal AWD 530CV", price: "€ 43.600", icon: "⚡" },
-        { brand: "Skoda", model: "Kodiaq 7 Posti", price: "€ 41.200", icon: "🦅" },
-        { brand: "Citroen", model: "Nuova ë-C3", price: "€ 23.900", icon: "☁️" }
-    ];
-
-    function initShowroom() {
-        // Vetrina Auto
-        const list = document.getElementById('car-list');
-        list.innerHTML = "";
-        cars.forEach(car => {
-            list.innerHTML += `
-                <div class="auto-card">
-                    <div class="auto-icon-circle">${car.icon}</div>
-                    <div class="auto-info">
-                        <span class="badge">${car.brand}</span>
-                        <h3 style="margin:0; font-size:1rem;">${car.model}</h3>
-                        <div class="price">${car.price}</div>
-                    </div>
-                </div>
-            `;
-        });
-
-        // Caricamento Promozioni
-        const promoHome = document.getElementById('promo-home-list');
-        const promoFull = document.getElementById('full-promo-list');
-        let promoHTML = "";
-        adminPromos.forEach(p => {
-            promoHTML += `
-                <div class="auto-card promo-card">
-                    <div class="auto-info">
-                        <span class="badge">${p.brand} <span class="promo-tag">${p.tag}</span></span>
-                        <h3 style="margin:0;">${p.model}</h3>
-                        <div class="price">${p.offer}</div>
-                        <p style="font-size:0.6rem; color:#888; margin-top:4px;">${p.date}</p>
-                    </div>
-                </div>
-            `;
-        });
-        promoHome.innerHTML = promoHTML;
-        promoFull.innerHTML = promoHTML;
-    }
-
-    function doLogin() {
-        const n = document.getElementById('u-nome').value;
-        const e = document.getElementById('u-email').value;
-        if(!n || !e.includes('@')) return alert("Dati incompleti!");
-        userName = n; userEmail = e;
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('logged-screen').style.display = 'block';
-        document.getElementById('profile-display-name').innerText = n;
-        document.getElementById('profile-display-email').innerText = e;
-        addBotMessage(`Benvenuto ${n}! Sono pronto. Chiedimi qualsiasi cosa sui modelli Peugeot, BYD, Skoda, Citroen, Jaecoo o gli altri.`);
-    }
-
-    function sendValutazione() {
-        const mod = document.getElementById('v-modello').value;
-        const km = document.getElementById('v-km').value;
-        if(!mod || !km) return alert("Inserisci i dati!");
-        alert("Dati inviati all'amministrazione Contauto Due.");
-    }
-
-    function switchPage(pageId, btn) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
-    function calcEco() {
-        const km = document.getElementById('eco-km').value;
-        if(!km) return;
-        document.getElementById('eco-res').innerHTML = `Risparmio stimato: €${Math.round(km * 0.16)} al mese rispetto al termico!`;
-    }
-
-    function saveGarage() {
-        const m = document.getElementById('g-model').value;
-        const t = document.getElementById('g-plate').value;
-        if(!m || !t) return alert("Inserisci i dati!");
-        document.getElementById('garage-display').innerHTML += `<div class="auto-card" style="border-left: 4px solid var(--primary);"><div class="auto-info"><h3>${m}</h3><p>TARGA: ${t.toUpperCase()}</p></div></div>`;
-    }
-
-    function addBotMessage(text) {
-        const win = document.getElementById('chat-window');
-        win.innerHTML += `<div class="bubble bot">${text}</div>`;
-        win.scrollTop = win.scrollHeight;
-    }
-
-    // LOGICA IA RIELABORATIVA (Intelligente)
-    function processAI() {
-        const input = document.getElementById('ai-input');
-        const win = document.getElementById('chat-window');
-        const text = input.value.trim();
-        if(!text) return;
-        
-        win.innerHTML += `<div class="bubble user">${text}</div>`;
-        const q = text.toLowerCase();
-        input.value = "";
-
-        let response = "";
-        const intro = userName ? `${userName}, ` : "";
-
-        // Analisi Context
-        const isFamily = q.includes("famiglia") || q.includes("spazio") || q.includes("figli");
-        const isElectric = q.includes("elettrica") || q.includes("batteria") || q.includes("autonomia");
-        const isOffer = q.includes("offerta") || q.includes("promozione") || q.includes("sconto") || q.includes("costa");
-
-        let brandKey = Object.keys(technicalDB).find(b => q.includes(b));
-
-        if (brandKey) {
-            const data = technicalDB[brandKey];
-            let modelKey = Object.keys(data.models).find(m => q.includes(m));
-            
-            if (modelKey) {
-                response = `${intro}ottima scelta. La **${brandKey.toUpperCase()} ${modelKey.toUpperCase()}** si distingue perché ${data.models[modelKey]}. Considerando che il brand punta tutto su ${data.focus}, è un acquisto molto intelligente. Vuoi prenotare un test drive?`;
-            } else {
-                response = `${intro}parlando di **${brandKey.toUpperCase()}**, devi sapere che la loro filosofia si basa su ${data.focus}. Attualmente i modelli di punta che gestiamo sono: ${Object.keys(data.models).join(", ")}. Quale si adatta meglio alle tue giornate?`;
-            }
+<!DOCTYPE html> 
+<html lang="it"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+    <title>Contauto Due | Official Digital Hub</title> 
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet"> 
+    <style> 
+        :root { 
+            --primary: #0066ff; 
+            --bg: #050505; 
+            --card: #121214; 
+            --text: #ffffff; 
+            --accent: #00f2ff; 
+            --glass: rgba(255, 255, 255, 0.05); 
+            --success: #00ff88; 
+            --promo: #ff3e3e; /* Colore aggiunto per le promo */ 
         } 
-        else if (isFamily) {
-            response = `${intro}per la famiglia consiglio senza dubbio la **Skoda Kodiaq** o la **Peugeot 5008** se cerchi i 7 posti. Se invece vuoi un SUV compatto ma spazioso, la **BYD Atto 3** ha una gestione degli spazi interni incredibile.`;
-        }
-        else if (isElectric) {
-            response = `${intro}sull'elettrico oggi il riferimento è la Blade Battery di **BYD**. La **Seal** è una vera sportiva, mentre la **Leapmotor T03** è la regina del rapporto qualità/prezzo in città. Hai già valutato il risparmio mensile col nostro calcolatore?`;
-        }
-        else if (isOffer) {
-            response = `${intro}abbiamo diverse promozioni attive, specialmente su **Peugeot 208** e **BYD Atto 3**. Puoi vederle tutte cliccando sull'icona "Promo" in basso! Ti interessa un preventivo su un modello specifico?`;
-        }
-        else if (q.includes("ciao") || q.includes("buongiorno")) {
-            response = `Ciao! Sono il consulente tecnico di Contauto Due. Chiedimi pure informazioni su prestazioni, motori o spazio dei nostri marchi. Da dove iniziamo?`;
-        }
-        else {
-            response = `${intro}come esperto tecnico, posso analizzare con te ogni dettaglio di Peugeot, BYD, Skoda e degli altri marchi. Cerchi un'auto più orientata al design o all'efficienza tecnologica?`;
-        }
 
-        setTimeout(() => addBotMessage(response), 600);
-    }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; } 
+        body {  
+            font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg);  
+            color: var(--text); margin: 0; padding: 0; overflow-x: hidden; 
+        } 
 
-    initShowroom();
-</script>
-</body>
+        /* Navigazione Schermate */ 
+        .page { display: none; width: 100%; max-width: 450px; margin: 0 auto; padding: 20px; animation: fadeIn 0.3s ease; } 
+        .page.active { display: block; } 
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } } 
+
+        /* Header */ 
+        header {  
+            position: sticky; top: 0; z-index: 1000; background: rgba(5,5,5,0.8); 
+            backdrop-filter: blur(15px); padding: 15px; border-bottom: 1px solid var(--glass); 
+            text-align: center; 
+        } 
+        .logo-text { font-weight: 800; letter-spacing: 2px; font-size: 1.1rem; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; } 
+
+        /* Categorie e Header Sezioni */ 
+        .category-label { font-size: 0.7rem; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px; display: block; } 
+
+        /* IA Chat Premium */ 
+        .ai-section { background: var(--glass); border: 1px solid var(--glass); border-radius: 24px; padding: 15px; margin-bottom: 20px; border-top: 2px solid var(--primary); } 
+        #chat-window { height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding: 5px; scroll-behavior: smooth; } 
+        .bubble { padding: 10px 14px; border-radius: 18px; font-size: 0.85rem; max-width: 85%; line-height: 1.4; position: relative; } 
+        .bot { background: #222; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #333; } 
+        .user { background: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(0,102,255,0.2); } 
+         
+        .chat-input-wrap { display: flex; gap: 10px; background: #000; padding: 8px; border-radius: 16px; border: 1px solid #333; } 
+        .chat-input-wrap input { flex: 1; background: transparent; border: none; color: #fff; padding: 5px 10px; outline: none; } 
+        .send-btn { background: var(--primary); border: none; border-radius: 12px; color: white; padding: 8px 15px; font-weight: bold; cursor: pointer; } 
+
+        /* Card Auto & Promo */ 
+        .auto-card { background: var(--card); border-radius: 20px; margin-bottom: 12px; border: 1px solid var(--glass); display: flex; align-items: center; padding: 15px; gap: 15px; transition: 0.3s; } 
+        .auto-card:active { transform: scale(0.98); background: #1a1a1c; } 
+        .promo-card { border-left: 4px solid var(--promo); background: linear-gradient(90deg, #1a0a0a, #121214); } 
+        .auto-icon-circle { width: 45px; height: 45px; background: var(--glass); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; border: 1px solid #333; } 
+        .auto-info { flex: 1; } 
+        .badge { font-size: 0.6rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 2px; display: block; } 
+        .price { font-size: 1.1rem; font-weight: 800; color: var(--success); } 
+        .promo-tag { background: var(--promo); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.55rem; font-weight: 900; margin-left: 5px; } 
+
+        /* Eco Calculator Box */ 
+        .eco-box { background: linear-gradient(135deg, #001a33, #000); border: 1px solid var(--primary); border-radius: 20px; padding: 18px; margin-bottom: 20px; } 
+
+        /* Menu Inferiore */ 
+        nav {  
+            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.95); 
+            backdrop-filter: blur(20px); display: flex; justify-content: space-around; 
+            padding: 12px 0 25px; border-top: 1px solid var(--glass); z-index: 1000; 
+        } 
+        .nav-item { border: none; background: none; color: #555; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; transition: 0.3s; } 
+        .nav-item.active { color: var(--primary); } 
+        .nav-item svg { width: 22px; height: 22px; } 
+
+        /* Elementi Generici */ 
+        .btn-full { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; } 
+        .btn-primary { background: var(--primary); color: white; } 
+        .btn-outline { background: transparent; border: 1px solid #333; color: white; } 
+        .input-std { width:100%; padding:12px; border-radius:8px; background:#000; border:1px solid #333; color:#fff; margin-bottom:10px; font-family: inherit; } 
+         
+        /* Stile Auth */ 
+        .auth-container { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--glass); margin-top: 10px; } 
+    </style> 
+</head> 
+<body> 
+
+<header> 
+    <div class="logo-text">CONTAUTO DUE</div> 
+</header> 
+
+<div id="showroom" class="page active"> 
+    <span class="category-label">Technical Expert Contauto</span> 
+    <div class="ai-section"> 
+        <div id="chat-window"> 
+            <div class="bubble bot">Buongiorno. Sono l'intelligenza tecnica di Contauto Due. Conosco ogni dettaglio dei marchi Peugeot, Citroen, Skoda, Jaecoo, Omoda, Leapmotor, BYD e Changan. Dimmi il tuo nome.</div> 
+        </div> 
+        <div class="chat-input-wrap"> 
+            <input type="text" id="ai-input" placeholder="Chiedimi di qualsiasi marchio o modello..."> 
+            <button class="send-btn" onclick="processAI()">OK</button> 
+        </div> 
+    </div> 
+
+    <span class="category-label">Promozioni Attive (Admin Panel)</span> 
+    <div id="promo-home-list"></div> 
+
+    <span class="category-label">Vetrina Modelli Rapida</span> 
+    <div id="car-list"></div> 
+    <div style="height: 80px;"></div> 
+</div> 
+
+<div id="offerte" class="page"> 
+    <span class="category-label">Tutte le Offerte Speciali</span> 
+    <div id="full-promo-list"></div> 
+    <p style="font-size: 0.7rem; color: #555; text-align: center; margin-top: 20px;">Le offerte vengono aggiornate in tempo reale dall'ufficio commerciale.</p> 
+</div> 
+
+<div id="service" class="page"> 
+    <span class="category-label">Calcolatori Efficienza</span> 
+    <div class="eco-box"> 
+        <h4 style="margin:0 0 10px 0; font-size:0.85rem; color:var(--accent);">⚡ ECO-CALCULATOR</h4> 
+        <p style="font-size:0.75rem; color:#aaa; margin-bottom:12px;">Confronta subito il tuo risparmio passando all'elettrico.</p> 
+        <input type="number" id="eco-km" class="input-std" placeholder="Km percorsi ogni mese"> 
+        <button class="btn-full btn-primary" style="padding:10px; font-size:0.8rem;" onclick="calcEco()">CALCOLA IL RISPARMIO</button> 
+        <div id="eco-res" style="margin-top:10px; font-size:0.85rem; color:var(--success); font-weight:600; text-align:center;"></div> 
+    </div> 
+
+    <span class="category-label">Valutazione Usato</span> 
+    <div class="auto-card" style="flex-direction: column; align-items: flex-start; padding: 20px; border-color: var(--accent);"> 
+        <span class="badge" style="color:var(--accent);">Stima Valore</span> 
+        <input type="text" id="v-modello" placeholder="Marca, Modello e Anno" class="input-std"> 
+        <input type="number" id="v-km" placeholder="Chilometri attuali" class="input-std"> 
+        <button class="btn-full btn-outline" onclick="sendValutazione()">INVIA ALL'AMMINISTRAZIONE</button> 
+    </div> 
+</div> 
+
+<div id="sedi" class="page"> 
+    <span class="category-label">Le nostre sedi ufficiali</span> 
+    <div class="auto-card" onclick="window.open('https://maps.google.com/?q=Contauto+Due+Teverola', '_blank')" style="cursor:pointer;"> 
+        <div class="auto-icon-circle">📍</div> 
+        <div class="auto-info"> 
+            <span class="badge">Sede Principale</span> 
+            <h3 style="margin:0;">Teverola</h3> 
+            <p style="font-size: 0.7rem; color: #888;">S.S. 7 bis km 11.400 - Zona ASI</p> 
+        </div> 
+        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0818114111'">📞</button> 
+    </div> 
+
+    <div class="auto-card" onclick="window.open('https://maps.google.com/?q=Contauto+Due+San+Marco+Evangelista', '_blank')" style="cursor:pointer;"> 
+        <div class="auto-icon-circle">📍</div> 
+        <div class="auto-info"> 
+            <span class="badge">Sede Secondaria</span> 
+            <h3 style="margin:0;">San Marco Evangelista</h3> 
+            <p style="font-size: 0.7rem; color: #888;">Via delle Industrie - San Marco Evangelista</p> 
+        </div> 
+        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0823123456'">📞</button> 
+    </div> 
+</div> 
+
+<div id="profilo" class="page"> 
+    <div id="auth-screen"> 
+        <div style="text-align: center; padding: 20px 0;"> 
+            <div style="width: 70px; height: 70px; background: var(--primary); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">👤</div> 
+            <h3>Profilo Unico</h3> 
+            <p style="color: #666; font-size: 0.8rem;">Accedi per attivare gli avvisi email personalizzati.</p> 
+        </div> 
+
+        <div class="auth-container"> 
+            <input type="text" id="u-nome" class="input-std" placeholder="Nome"> 
+            <input type="text" id="u-cognome" class="input-std" placeholder="Cognome"> 
+            <input type="email" id="u-email" class="input-std" placeholder="Email (per avvisi)"> 
+            <input type="password" id="u-pass" class="input-std" placeholder="Password"> 
+            <button class="btn-full btn-primary" onclick="doLogin()">ATTIVA ACCOUNT</button> 
+        </div> 
+    </div> 
+
+    <div id="logged-screen" style="display:none;"> 
+        <div style="text-align: center; padding: 20px 0;"> 
+            <div style="width: 70px; height: 70px; background: var(--success); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">✅</div> 
+            <h3 id="profile-display-name">Digital Garage</h3> 
+            <p id="profile-display-email" style="color: var(--accent); font-size: 0.8rem;"></p> 
+        </div> 
+
+        <span class="category-label">Aggiungi veicolo</span> 
+        <div class="auto-card" style="flex-direction:column; padding:20px;"> 
+            <input type="text" id="g-model" class="input-std" placeholder="Modello Auto"> 
+            <input type="text" id="g-plate" class="input-std" placeholder="Targa"> 
+            <button class="btn-full btn-primary" onclick="saveGarage()">SALVA NEL GARAGE</button> 
+        </div> 
+         
+        <div id="garage-display"></div> 
+        <button class="btn-full btn-outline" style="margin-top:20px;" onclick="location.reload()">LOGOUT</button> 
+    </div> 
+</div> 
+
+<nav> 
+    <button class="nav-item active" onclick="switchPage('showroom', this)"> 
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/></svg> 
+        <span>Auto</span> 
+    </button> 
+    <button class="nav-item" onclick="switchPage('offerte', this)"> 
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.42-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg> 
+        <span>Promo</span> 
+    </button> 
+    <button class="nav-item" onclick="switchPage('service', this)"> 
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.5 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg> 
+        <span>Tools</span> 
+    </button> 
+    <button class="nav-item" onclick="switchPage('profilo', this)"> 
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> 
+        <span>Profilo</span> 
+    </button> 
+</nav> 
+
+<script> 
+    let userName = ""; 
+    let userEmail = ""; 
+
+    // DATABASE PROMOZIONI 
+    const adminPromos = [ 
+        { brand: "PEUGEOT", model: "Nuova 208 Hybrid", offer: "Tua da € 149/mese", tag: "SOTTOCOSTO", date: "Scade 28/02" }, 
+        { brand: "BYD", model: "Atto 3 Elettrica", offer: "EcoBonus + Wallbox Gratis", tag: "GREEN", date: "Scade 15/03" }, 
+        { brand: "LEAPMOTOR", model: "T03 Urban", offer: "City car elettrica a tasso zero", tag: "SMART", date: "Offerta Limitata" } 
+    ]; 
+
+    const technicalDB = { 
+        peugeot: { 
+            desc: "Design graffiante (Artiglio del Leone) e interni rivoluzionari i-Cockpit®.", 
+            focus: "estetica futuristica e piacere di guida", 
+            models: { 
+                "208": "Disponibile Benzina, Hybrid (100/136 CV) o E-208 100% elettrica (fino a 410km WLTP).", 
+                "2008": "SUV compatto. Versioni termiche o E-2008 elettrica.", 
+                "3008": "Nuovo SUV Fastback Hybrid o E-3008 (fino a 700km di autonomia).", 
+                "408": "La 'Dynamic Fastback'. Plug-in Hybrid da 180 o 225 CV.", 
+                "5008": "Il grande SUV a 7 posti. Spazio infinito e tecnologia di vertice." 
+            } 
+        }, 
+        citroen: { 
+            desc: "Focus assoluto sul Comfort con sospensioni Progressive Hydraulic Cushions®.", 
+            focus: "comodità di marcia e versatilità", 
+            models: { 
+                "c3": "Nuova generazione. Anche 100% elettrica (ë-C3). Comfort e accessibilità.", 
+                "c4": "Design crossover, comfort 'Advanced Comfort' unico. Anche elettrica.", 
+                "c5 aircross": "Il SUV più comodo del segmento, disponibile Plug-in Hybrid.", 
+                "ami": "La soluzione di micro-mobilità 100% elettrica urbana." 
+            } 
+        }, 
+        skoda: { 
+            desc: "Filosofia 'Simply Clever': spazio intelligente, praticità e solidità costruttiva.", 
+            focus: "spazio interno e soluzioni pratiche 'Simply Clever'", 
+            models: { 
+                "kamiq": "City SUV di successo. Ergonomia perfetta e ottima connettività.", 
+                "kodiaq": "Il SUV ammiraglia a 7 posti. Motori TDI EVO o nuovo Plug-in.", 
+                "octavia": "Icona di spazio e comfort (Wagon o Berlina).", 
+                "enyaq": "Il SUV elettrico puro di Skoda. Fino a 560km di autonomia." 
+            } 
+        }, 
+        byd: { 
+            desc: "Leader mondiale NEV con l'esclusiva Blade Battery (sicura ed efficiente).", 
+            focus: "tecnologia delle batterie e prestazioni elettriche", 
+            models: { 
+                "dolphin": "Hatchback elettrica di segmento C, agile e sicura.", 
+                "atto 3": "SUV elettrico tech, interni futuristici e Blade Battery.", 
+                "seal": "Berlina sportiva 530 CV (AWD), 0-100 in 3.8s.", 
+                "han": "Ammiraglia elettrica di lusso, prestazioni premium." 
+            } 
+        }, 
+        leapmotor: { 
+            desc: "Mobilità elettrica intelligente e democratica, partnership con Stellantis.", 
+            focus: "elettrico accessibile e tecnologico", 
+            models: { 
+                "t03": "City car elettrica 5 porte. Batteria 41.3 kWh, 280km autonomia, ADAS di livello 2.", 
+                "c10": "SUV familiare elettrico moderno, focus su sicurezza e connettività." 
+            } 
+        }, 
+        jaecoo: { 
+            desc: "Nuovo brand di lusso specializzato in SUV con attitudine Off-Road.", 
+            focus: "lusso off-road e robustezza elegante", 
+            models: { 
+                "j7": "SUV 4x4 intelligente. Motore 1.6 TGDI 197 CV, interni minimal e display 14.8 pollici." 
+            } 
+        }, 
+        omoda: { 
+            desc: "Design futuristico (Art in Motion) e tecnologia ADAS di serie completa.", 
+            focus: "stile all'avanguardia e sicurezza", 
+            models: { 
+                "omoda 5": "Crossover sportivo 1.6 Turbo 147 CV o versione elettrica Omoda 5 EV." 
+            } 
+        }, 
+        changan: { 
+            desc: "Uno dei colossi dell'innovazione asiatica, qualità costruttiva impeccabile.", 
+            focus: "innovazione e alta qualità costruttiva", 
+            models: { 
+                "deepal s07": "SUV elettrico dal design futuristico e tecnologia AI avanzata." 
+            } 
+        } 
+    }; 
+
+    const cars = [ 
+        { brand: "Peugeot", model: "Nuova 3008 Hybrid", price: "€ 38.700", icon: "🦁" }, 
+        { brand: "Leapmotor", model: "T03 Elettrica", price: "€ 18.900", icon: "🔋" }, 
+        { brand: "BYD", model: "Seal AWD 530CV", price: "€ 43.600", icon: "⚡" }, 
+        { brand: "Jaecoo", model: "J7 4WD", price: "€ 33.900", icon: "🏔️" } 
+    ]; 
+
+    function initShowroom() { 
+        const list = document.getElementById('car-list'); 
+        list.innerHTML = ""; 
+        cars.forEach(car => { 
+            list.innerHTML += ` 
+                <div class="auto-card"> 
+                    <div class="auto-icon-circle">${car.icon}</div> 
+                    <div class="auto-info"> 
+                        <span class="badge">${car.brand}</span> 
+                        <h3 style="margin:0; font-size:1rem;">${car.model}</h3> 
+                        <div class="price">${car.price}</div> 
+                    </div> 
+                </div> 
+            `; 
+        }); 
+
+        const promoHome = document.getElementById('promo-home-list'); 
+        const promoFull = document.getElementById('full-promo-list'); 
+        let promoHTML = ""; 
+        adminPromos.forEach(p => { 
+            promoHTML += ` 
+                <div class="auto-card promo-card"> 
+                    <div class="auto-info"> 
+                        <span class="badge">${p.brand} <span class="promo-tag">${p.tag}</span></span> 
+                        <h3 style="margin:0;">${p.model}</h3> 
+                        <div class="price">${p.offer}</div> 
+                        <p style="font-size:0.6rem; color:#888; margin-top:4px;">${p.date}</p> 
+                    </div> 
+                </div> 
+            `; 
+        }); 
+        promoHome.innerHTML = promoHTML; 
+        promoFull.innerHTML = promoHTML; 
+    } 
+
+    function doLogin() { 
+        const n = document.getElementById('u-nome').value; 
+        const e = document.getElementById('u-email').value; 
+        if(!n || !e.includes('@')) return alert("Dati incompleti!"); 
+        userName = n; userEmail = e; 
+        document.getElementById('auth-screen').style.display = 'none'; 
+        document.getElementById('logged-screen').style.display = 'block'; 
+        document.getElementById('profile-display-name').innerText = n; 
+        document.getElementById('profile-display-email').innerText = e; 
+        addBotMessage(`Benvenuto ${n}! Sono pronto. Chiedimi qualsiasi cosa sui modelli Peugeot, BYD, Skoda, Leapmotor, Jaecoo o gli altri.`); 
+    } 
+
+    function sendValutazione() { 
+        const mod = document.getElementById('v-modello').value; 
+        const km = document.getElementById('v-km').value; 
+        if(!mod || !km) return alert("Inserisci i dati!"); 
+        alert("Dati inviati all'amministrazione Contauto Due."); 
+    } 
+
+    function switchPage(pageId, btn) { 
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
+        document.getElementById(pageId).classList.add('active'); 
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); 
+        btn.classList.add('active'); 
+    } 
+
+    function calcEco() { 
+        const km = document.getElementById('eco-km').value; 
+        if(!km) return; 
+        document.getElementById('eco-res').innerHTML = `Risparmio stimato: €${Math.round(km * 0.16)} al mese rispetto al termico!`; 
+    } 
+
+    function saveGarage() { 
+        const m = document.getElementById('g-model').value; 
+        const t = document.getElementById('g-plate').value; 
+        if(!m || !t) return alert("Inserisci i dati!"); 
+        document.getElementById('garage-display').innerHTML += `<div class="auto-card" style="border-left: 4px solid var(--primary);"><div class="auto-info"><h3>${m}</h3><p>TARGA: ${t.toUpperCase()}</p></div></div>`; 
+    } 
+
+    function addBotMessage(text) { 
+        const win = document.getElementById('chat-window'); 
+        win.innerHTML += `<div class="bubble bot">${text}</div>`; 
+        win.scrollTop = win.scrollHeight; 
+    } 
+
+    function processAI() { 
+        const input = document.getElementById('ai-input'); 
+        const win = document.getElementById('chat-window'); 
+        const text = input.value.trim(); 
+        if(!text) return; 
+         
+        win.innerHTML += `<div class="bubble user">${text}</div>`; 
+        const q = text.toLowerCase(); 
+        input.value = ""; 
+
+        let response = ""; 
+        const intro = userName ? `${userName}, ` : ""; 
+
+        const isFamily = q.includes("famiglia") || q.includes("spazio") || q.includes("figli"); 
+        const isElectric = q.includes("elettrica") || q.includes("batteria") || q.includes("autonomia"); 
+        const isOffer = q.includes("offerta") || q.includes("promozione") || q.includes("sconto"); 
+
+        let brandKey = Object.keys(technicalDB).find(b => q.includes(b)); 
+
+        if (brandKey) { 
+            const data = technicalDB[brandKey]; 
+            let modelKey = Object.keys(data.models).find(m => q.includes(m)); 
+             
+            if (modelKey) { 
+                response = `${intro}La **${brandKey.toUpperCase()} ${modelKey.toUpperCase()}** è un'ottima scelta. ${data.models[modelKey]} Vuoi approfondire l'allestimento?`; 
+            } else { 
+                response = `${intro}per **${brandKey.toUpperCase()}**, i modelli che trattiamo sono: ${Object.keys(data.models).join(", ")}. Quale ti interessa analizzare tecnicamente?`; 
+            } 
+        }  
+        else if (isFamily) { 
+            response = `${intro}per la famiglia ti consiglio la **Skoda Kodiaq** (7 posti) o la nuova **Leapmotor C10**, spaziosa ed elettrica.`; 
+        } 
+        else if (isElectric) { 
+            response = `${intro}sull'elettrico abbiamo il top: la Blade Battery di **BYD** o l'accessibilità della **Leapmotor T03**.`; 
+        } 
+        else if (isOffer) { 
+            response = `${intro}abbiamo ottime promozioni su **Peugeot 208** e **Leapmotor**. Controlla la sezione Promo in basso!`; 
+        } 
+        else { 
+            response = `${intro}come esperto tecnico, posso aiutarti su Peugeot, BYD, Skoda, Leapmotor, Jaecoo, Omoda, Changan e Citroen. Cosa cerchi oggi?`; 
+        } 
+
+        setTimeout(() => addBotMessage(response), 600); 
+    } 
+
+    initShowroom(); 
+</script> 
+</body> 
 </html>
