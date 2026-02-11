@@ -49,7 +49,7 @@
         .chat-input-wrap input { flex: 1; background: transparent; border: none; color: #fff; padding: 5px 10px; outline: none; }
         .send-btn { background: var(--primary); border: none; border-radius: 12px; color: white; padding: 8px 15px; font-weight: bold; cursor: pointer; }
 
-        /* Card Auto (Nuovo Design senza rettangoli vuoti) */
+        /* Card Auto */
         .auto-card { background: var(--card); border-radius: 20px; margin-bottom: 12px; border: 1px solid var(--glass); display: flex; align-items: center; padding: 15px; gap: 15px; transition: 0.3s; }
         .auto-card:active { transform: scale(0.98); background: #1a1a1c; }
         .auto-icon-circle { width: 45px; height: 45px; background: var(--glass); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; border: 1px solid #333; }
@@ -75,6 +75,9 @@
         .btn-primary { background: var(--primary); color: white; }
         .btn-outline { background: transparent; border: 1px solid #333; color: white; }
         .input-std { width:100%; padding:12px; border-radius:8px; background:#000; border:1px solid #333; color:#fff; margin-bottom:10px; font-family: inherit; }
+        
+        /* Stile Auth */
+        .auth-container { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--glass); margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -110,21 +113,9 @@
         <div id="eco-res" style="margin-top:10px; font-size:0.85rem; color:var(--success); font-weight:600; text-align:center;"></div>
     </div>
 
-    <span class="category-label">Gestione Assistenza</span>
-    <div class="auto-card" style="flex-direction: column; align-items: flex-start; padding: 20px;">
-        <span class="badge">Prenotazione Officina</span>
-        <input type="text" id="service-targa" placeholder="Inserisci Targa" class="input-std">
-        <select class="input-std">
-            <option>Tagliando</option>
-            <option>Revisione</option>
-            <option>Check-up Elettrico</option>
-        </select>
-        <button class="btn-full btn-primary" onclick="alert('Richiesta inviata al Service!')">PRENOTA ORA</button>
-    </div>
-
-    <span class="category-label">Compravendita</span>
+    <span class="category-label">Valutazione Usato</span>
     <div class="auto-card" style="flex-direction: column; align-items: flex-start; padding: 20px; border-color: var(--accent);">
-        <span class="badge" style="color:var(--accent);">Valutazione Usato</span>
+        <span class="badge" style="color:var(--accent);">Stima Valore</span>
         <input type="text" placeholder="Marca, Modello e Anno" class="input-std">
         <button class="btn-full btn-outline" onclick="alert('I periti analizzeranno i dati!')">STIMA VALORE</button>
     </div>
@@ -153,20 +144,39 @@
 </div>
 
 <div id="profilo" class="page">
-    <div style="text-align: center; padding: 20px 0;">
-        <div style="width: 70px; height: 70px; background: var(--primary); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">👤</div>
-        <h3 id="profile-title">Digital Garage</h3>
-        <p id="profile-sub" style="color: #666; font-size: 0.8rem;">I tuoi dati e le tue auto salvate.</p>
+    <div id="auth-screen">
+        <div style="text-align: center; padding: 20px 0;">
+            <div style="width: 70px; height: 70px; background: var(--primary); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">👤</div>
+            <h3>Profilo Unico</h3>
+            <p style="color: #666; font-size: 0.8rem;">Accedi per attivare gli avvisi email personalizzati.</p>
+        </div>
+
+        <div class="auth-container">
+            <input type="text" id="u-nome" class="input-std" placeholder="Nome">
+            <input type="text" id="u-cognome" class="input-std" placeholder="Cognome">
+            <input type="email" id="u-email" class="input-std" placeholder="Email (per avvisi)">
+            <input type="password" id="u-pass" class="input-std" placeholder="Password">
+            <button class="btn-full btn-primary" onclick="doLogin()">ATTIVA ACCOUNT</button>
+        </div>
     </div>
 
-    <span class="category-label">Aggiungi veicolo</span>
-    <div class="auto-card" style="flex-direction:column; padding:20px;">
-        <input type="text" id="g-model" class="input-std" placeholder="Modello Auto">
-        <input type="text" id="g-plate" class="input-std" placeholder="Targa">
-        <button class="btn-full btn-primary" onclick="saveGarage()">SALVA NEL GARAGE</button>
+    <div id="logged-screen" style="display:none;">
+        <div style="text-align: center; padding: 20px 0;">
+            <div style="width: 70px; height: 70px; background: var(--success); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">✅</div>
+            <h3 id="profile-display-name">Digital Garage</h3>
+            <p id="profile-display-email" style="color: var(--accent); font-size: 0.8rem;"></p>
+        </div>
+
+        <span class="category-label">Aggiungi veicolo</span>
+        <div class="auto-card" style="flex-direction:column; padding:20px;">
+            <input type="text" id="g-model" class="input-std" placeholder="Modello Auto">
+            <input type="text" id="g-plate" class="input-std" placeholder="Targa">
+            <button class="btn-full btn-primary" onclick="saveGarage()">SALVA NEL GARAGE</button>
+        </div>
+        
+        <div id="garage-display"></div>
+        <button class="btn-full btn-outline" style="margin-top:20px;" onclick="location.reload()">LOGOUT</button>
     </div>
-    
-    <div id="garage-display"></div>
 </div>
 
 <nav>
@@ -190,6 +200,7 @@
 
 <script>
     let userName = "";
+    let userEmail = "";
     const cars = [
         { brand: "Peugeot", model: "Nuova 3008 Hybrid", price: "€ 38.700", icon: "🦁" },
         { brand: "BYD", model: "Seal Design", price: "€ 43.600", icon: "⚡" },
@@ -215,6 +226,29 @@
                 </div>
             `;
         });
+    }
+
+    function doLogin() {
+        const n = document.getElementById('u-nome').value;
+        const c = document.getElementById('u-cognome').value;
+        const e = document.getElementById('u-email').value;
+        const p = document.getElementById('u-pass').value;
+
+        if(!n || !c || !e.includes('@') || p.length < 4) {
+            alert("Compila tutti i campi correttamente!");
+            return;
+        }
+
+        userName = n;
+        userEmail = e;
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('logged-screen').style.display = 'block';
+        document.getElementById('profile-display-name').innerText = n + " " + c;
+        document.getElementById('profile-display-email').innerText = e;
+        
+        const win = document.getElementById('chat-window');
+        win.innerHTML += `<div class="bubble bot">Benvenuto nel club Contauto Due, <b>${n}</b>! Ho attivato il sistema di avvisi sulla tua email. Di cosa parliamo oggi?</div>`;
+        win.scrollTop = win.scrollHeight;
     }
 
     function switchPage(pageId, btn) {
@@ -243,11 +277,9 @@
                     <p style="margin:0; font-size:0.8rem; color:var(--accent);">TARGA: ${t.toUpperCase()}</p>
                 </div>
             </div>`;
-        document.getElementById('service-targa').value = t.toUpperCase();
-        alert("Auto aggiunta correttamente!");
+        alert("Auto aggiunta! Riceverai avvisi email per questo veicolo.");
     }
 
-    // MOTORE IA AVANZATO CON OLTRE 10.000 COMBINAZIONI POSSIBILI
     function processAI() {
         const input = document.getElementById('ai-input');
         const win = document.getElementById('chat-window');
@@ -258,41 +290,20 @@
         input.value = "";
 
         let response = "";
-        
-        // Fase 1: Identificazione Utente
-        if(!userName) {
+        const greetings = ["Certamente " + (userName || "amico") + ", ", "Ottima domanda, ", "Ecco cosa so: ", "Guarda " + (userName || "") + ", "];
+        const prefix = greetings[Math.floor(Math.random()*greetings.length)];
+
+        if (q.includes("peugeot")) {
+            response = prefix + "Peugeot è il nostro marchio storico. La Nuova 3008 Hybrid è disponibile per un test drive a Teverola.";
+        } else if (q.includes("byd")) {
+            response = prefix + "BYD Seal è pura tecnologia. Se vuoi, posso inviarti la scheda tecnica sulla tua email " + (userEmail || "non ancora registrata") + ".";
+        } else if (q.includes("leapmotor")) {
+            response = prefix + "Leapmotor T03 è l'elettrica più intelligente della gamma. Ti avviserò via email appena avremo nuove promozioni.";
+        } else if (!userName && text.length > 2) {
             userName = text;
-            document.getElementById('profile-title').innerText = "Garage di " + userName;
-            response = `Piacere di conoscerti ${userName}! Sono l'esperto virtuale di Contauto Due. Posso aiutarti a scegliere tra Peugeot, Skoda, BYD o i nuovi marchi Omoda e Jaecoo. Cosa ti incuriosisce oggi?`;
+            response = `Piacere di conoscerti ${userName}! Inserisci anche la tua email nel profilo per ricevere gli avvisi tecnici. Di quale auto vuoi parlare?`;
         } else {
-            // Fase 2: Motore di Analisi Semantica
-            const patterns = {
-                peugeot: ["3008", "208", "2008", "5008", "408", "i-move"],
-                byd: ["seal", "atto", "dolphin", "batteria", "blade"],
-                skoda: ["kodiaq", "superb", "octavia", "enyaq"],
-                cina: ["omoda", "jaecoo", "leapmotor", "changan", "j7", "t03"],
-                sedi: ["teverola", "san marco", "dove", "indirizzo", "caserta", "napoli"],
-                prezzo: ["quanto costa", "prezzo", "rata", "finanziamento", "sconto", "offerta"]
-            };
-
-            const greetings = ["Certamente " + userName + ", ", "Ottima domanda, ", "Ecco cosa so, " + userName + ": ", "Guarda " + userName + ", "];
-            const prefix = greetings[Math.floor(Math.random()*greetings.length)];
-
-            if (q.includes("peugeot") || patterns.peugeot.some(p => q.includes(p))) {
-                response = prefix + "Peugeot è il nostro marchio storico. La Nuova 3008 Hybrid sta avendo un successo enorme a Teverola. Vuoi conoscere le promozioni i-Move del mese?";
-            } else if (q.includes("byd") || patterns.byd.some(p => q.includes(p))) {
-                response = prefix + "BYD è il numero 1 al mondo per le batterie. La Seal è una berlina sportiva incredibile che puoi provare oggi stesso. Ti interessa la tecnologia Blade Battery?";
-            } else if (q.includes("skoda") || patterns.skoda.some(p => q.includes(p))) {
-                response = prefix + "Skoda offre una qualità costruttiva superiore. Il Kodiaq a San Marco Evangelista è il SUV perfetto per chi cerca spazio e affidabilità.";
-            } else if (q.includes("jaecoo") || q.includes("omoda") || patterns.cina.some(p => q.includes(p))) {
-                response = prefix + "Jaecoo J7 e Omoda 5 sono i nuovi giganti del design. Hanno dotazioni premium a prezzi incredibili e 7 anni di garanzia. Vuoi un preventivo?";
-            } else if (patterns.sedi.some(p => q.includes(p))) {
-                response = prefix + "Siamo presenti a Teverola (Zona ASI) e San Marco Evangelista. Entrambe le sedi gestiscono tutti i nostri 8 marchi. Quale ti è più vicina?";
-            } else if (patterns.prezzo.some(p => q.includes(p))) {
-                response = prefix + "Le offerte cambiano ogni settimana! Per darti un'idea, Leapmotor T03 è tra le elettriche più accessibili del mercato. Su quale modello volevi la rata?";
-            } else {
-                response = prefix + "Come consulente Contauto Due gestisco Peugeot, Citroen, Skoda, BYD, Omoda, Jaecoo, Leapmotor e Changan. Chiedimi pure dettagli tecnici o disponibilità su uno di questi!";
-            }
+            response = prefix + "In Contauto Due trattiamo Peugeot, Citroen, Skoda, BYD, Omoda, Jaecoo, Leapmotor e Changan. Come posso aiutarti oggi?";
         }
 
         setTimeout(() => {
