@@ -44,6 +44,7 @@
       z-index: 999;
       background: rgba(10, 12, 18, 0.92);
       backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
       border: 1px solid rgba(255, 255, 255, 0.12);
       box-shadow: 0 20px 70px rgba(0, 0, 0, 0.55);
       border-radius: 28px;
@@ -183,6 +184,7 @@
       background: rgba(10, 12, 18, 0.92);
       border: 1px solid rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-radius: 24px;
       z-index: 999;
       padding: 16px;
@@ -235,6 +237,7 @@
       background: rgba(255, 68, 68, 0.13);
       border: 1px solid rgba(255, 110, 110, 0.35);
       backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       border-radius: 20px;
       padding: 14px;
       color: #ffd6d6;
@@ -376,6 +379,8 @@
   <div class="error-box" id="errorBox"></div>
 
   <script>
+    const GEOAPIFY_KEY = "c52bc1e58e1543acaf1233caae7f1bfa";
+
     const map = L.map("map", {
       zoomControl: true
     }).setView([41.9028, 12.4964], 6);
@@ -411,9 +416,9 @@
       errorBox.innerText = message;
       errorBox.style.display = "block";
 
-      setTimeout(() => {
+      setTimeout(function () {
         errorBox.style.display = "none";
-      }, 8000);
+      }, 9000);
     }
 
     function setStatus(text) {
@@ -425,7 +430,10 @@
 
       return function (...args) {
         clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), delay);
+
+        timeout = setTimeout(function () {
+          func.apply(this, args);
+        }, delay);
       };
     }
 
@@ -439,7 +447,9 @@
       const hours = Math.floor(minutes / 60);
       const mins = Math.round(minutes % 60);
 
-      if (mins === 0) return hours + " h";
+      if (mins === 0) {
+        return hours + " h";
+      }
 
       return hours + " h " + mins + " min";
     }
@@ -472,12 +482,69 @@
       return R * c;
     }
 
+    async function searchPlacesGeoapify(query) {
+      if (!GEOAPIFY_KEY || GEOAPIFY_KEY === "INSERISCI_LA_TUA_API_KEY") {
+        throw new Error("Devi inserire la tua API key Geoapify nel codice.");
+      }
+
+      const url =
+        "https://api.geoapify.com/v1/geocode/autocomplete?" +
+        new URLSearchParams({
+          text: query.trim(),
+          limit: "8",
+          lang: "it",
+          apiKey: c52bc1e58e1543acaf1233caae7f1bfa
+        }).toString();
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error("Errore suggerimenti. Controlla la API key Geoapify.");
+      }
+
+      const data = await response.json();
+
+      return (data.features || []).map(function (feature) {
+        const p = feature.properties || {};
+        const coords = feature.geometry.coordinates;
+
+        return {
+          title:
+            p.name ||
+            p.street ||
+            p.city ||
+            p.formatted ||
+            "Luogo",
+          subtitle:
+            p.formatted ||
+            [
+              p.street,
+              p.city,
+              p.county,
+              p.state,
+              p.country
+            ].filter(Boolean).join(", "),
+          name:
+            p.formatted ||
+            [
+              p.name,
+              p.street,
+              p.city,
+              p.country
+            ].filter(Boolean).join(", "),
+          lat: coords[1],
+          lon: coords[0],
+          source: "Geoapify"
+        };
+      });
+    }
+
     async function searchPlacesPhoton(query) {
       const url =
         "https://photon.komoot.io/api/?" +
         new URLSearchParams({
-          q: query,
-          limit: 8,
+          q: query.trim(),
+          limit: "8",
           lang: "it"
         }).toString();
 
@@ -489,7 +556,7 @@
 
       const data = await response.json();
 
-      return (data.features || []).map(feature => {
+      return (data.features || []).map(function (feature) {
         const p = feature.properties || {};
         const coords = feature.geometry.coordinates;
 
@@ -528,7 +595,7 @@
       const url =
         "https://nominatim.openstreetmap.org/search?" +
         new URLSearchParams({
-          q: query,
+          q: query.trim(),
           format: "jsonv2",
           addressdetails: "1",
           limit: "1",
@@ -547,18 +614,18 @@
 
       const data = await response.json();
 
-      if (!data || !data.length) return null;
+      if (!data || !data.length) return [];
 
-      const first = data[0];
-
-      return {
-        title: first.name || first.display_name || "Luogo",
-        subtitle: first.display_name || "",
-        name: first.display_name || first.name || "Luogo",
-        lat: parseFloat(first.lat),
-        lon: parseFloat(first.lon),
-        source: "Nominatim"
-      };
+      return data.map(function (place) {
+        return {
+          title: place.name || place.display_name || "Luogo",
+          subtitle: place.display_name || "",
+          name: place.display_name || place.name || "Luogo",
+          lat: parseFloat(place.lat),
+          lon: parseFloat(place.lon),
+          source: "Nominatim"
+        };
+      });
     }
 
     async function searchPlaces(query) {
@@ -569,16 +636,25 @@
       const cleanQuery = query.trim();
 
       try {
-        const results = await searchPlacesPhoton(cleanQuery);
+        return await searchPlacesGeoapify(cleanQuery);
+      } catch (geoapifyError) {
+        try {
+          const photonResults = await searchPlacesPhoton(cleanQuery);
 
-        if (results.length) {
-          return results;
-        }
+          if (photonResults.length) {
+            return photonResults;
+          }
+        } catch (photonError) {}
 
-        return [];
-      } catch (err) {
-        showError("Suggerimenti non disponibili ora. Puoi comunque scrivere e premere Vai.");
-        return [];
+        try {
+          const nominatimResults = await searchPlacesNominatimOnce(cleanQuery);
+
+          if (nominatimResults.length) {
+            return nominatimResults;
+          }
+        } catch (nominatimError) {}
+
+        throw geoapifyError;
       }
     }
 
@@ -591,11 +667,19 @@
 
         locationItem.innerHTML = `
           <div class="suggestion-title use-location">📍 Usa posizione attuale</div>
-          <div class="suggestion-sub">Il browser ti chiederà il permesso</div>
+          <div class="suggestion-sub">Clicca qui: il browser chiederà il permesso GPS</div>
         `;
 
         locationItem.addEventListener("mousedown", function (event) {
           event.preventDefault();
+          event.stopPropagation();
+          box.style.display = "none";
+          useCurrentLocation();
+        });
+
+        locationItem.addEventListener("touchstart", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
           box.style.display = "none";
           useCurrentLocation();
         });
@@ -609,7 +693,7 @@
 
         emptyItem.innerHTML = `
           <div class="suggestion-title">Nessun suggerimento</div>
-          <div class="suggestion-sub">Prova a scrivere città + via, esempio: Via Vittorio Emanuele Roma</div>
+          <div class="suggestion-sub">Controlla la connessione, la API key o scrivi meglio il luogo</div>
         `;
 
         box.appendChild(emptyItem);
@@ -617,7 +701,7 @@
         return;
       }
 
-      results.forEach(place => {
+      results.forEach(function (place) {
         const item = document.createElement("div");
         item.className = "suggestion";
 
@@ -628,19 +712,14 @@
 
         item.addEventListener("mousedown", function (event) {
           event.preventDefault();
+          event.stopPropagation();
+          selectPlace(place, input, box, type);
+        });
 
-          if (type === "start") {
-            startPlace = place;
-            input.value = place.name;
-            setMarker("start", place);
-            endInput.focus();
-          } else {
-            endPlace = place;
-            input.value = place.name;
-            setMarker("end", place);
-          }
-
-          box.style.display = "none";
+        item.addEventListener("touchstart", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          selectPlace(place, input, box, type);
         });
 
         box.appendChild(item);
@@ -649,25 +728,46 @@
       box.style.display = "block";
     }
 
+    function selectPlace(place, input, box, type) {
+      if (type === "start") {
+        startPlace = place;
+        input.value = place.name;
+        setMarker("start", place);
+        endInput.focus();
+      } else {
+        endPlace = place;
+        input.value = place.name;
+        setMarker("end", place);
+      }
+
+      box.style.display = "none";
+    }
+
     const handleStartSearch = debounce(async function () {
       const query = startInput.value.trim();
 
       if (query.length < 2) {
-        startSuggestions.style.display = "none";
+        renderSuggestions([], startSuggestions, startInput, "start");
         return;
       }
 
       startSuggestions.innerHTML = `
         <div class="suggestion">
           <div class="suggestion-title">Cerco...</div>
-          <div class="suggestion-sub">Sto cercando nei dati OpenStreetMap</div>
+          <div class="suggestion-sub">Ricerca nel database mondiale</div>
         </div>
       `;
+
       startSuggestions.style.display = "block";
 
-      const results = await searchPlaces(query);
-      renderSuggestions(results, startSuggestions, startInput, "start");
-    }, 400);
+      try {
+        const results = await searchPlaces(query);
+        renderSuggestions(results, startSuggestions, startInput, "start");
+      } catch (err) {
+        showError(err.message || "Errore durante la ricerca della partenza.");
+        renderSuggestions([], startSuggestions, startInput, "start");
+      }
+    }, 350);
 
     const handleEndSearch = debounce(async function () {
       const query = endInput.value.trim();
@@ -680,14 +780,20 @@
       endSuggestions.innerHTML = `
         <div class="suggestion">
           <div class="suggestion-title">Cerco...</div>
-          <div class="suggestion-sub">Sto cercando nei dati OpenStreetMap</div>
+          <div class="suggestion-sub">Ricerca nel database mondiale</div>
         </div>
       `;
+
       endSuggestions.style.display = "block";
 
-      const results = await searchPlaces(query);
-      renderSuggestions(results, endSuggestions, endInput, "end");
-    }, 400);
+      try {
+        const results = await searchPlaces(query);
+        renderSuggestions(results, endSuggestions, endInput, "end");
+      } catch (err) {
+        showError(err.message || "Errore durante la ricerca dell’arrivo.");
+        renderSuggestions([], endSuggestions, endInput, "end");
+      }
+    }, 350);
 
     startInput.addEventListener("input", function () {
       startPlace = null;
@@ -723,6 +829,16 @@
       }
     });
 
+    document.addEventListener("touchstart", function (event) {
+      if (!startInput.contains(event.target) && !startSuggestions.contains(event.target)) {
+        startSuggestions.style.display = "none";
+      }
+
+      if (!endInput.contains(event.target) && !endSuggestions.contains(event.target)) {
+        endSuggestions.style.display = "none";
+      }
+    });
+
     function setMarker(type, place) {
       const markerIcon = L.divIcon({
         html: type === "start" ? "📍" : "🏁",
@@ -732,13 +848,17 @@
       });
 
       if (type === "start") {
-        if (startMarker) map.removeLayer(startMarker);
+        if (startMarker) {
+          map.removeLayer(startMarker);
+        }
 
         startMarker = L.marker([place.lat, place.lon], {
           icon: markerIcon
         }).addTo(map).bindPopup("Partenza<br>" + place.name);
       } else {
-        if (endMarker) map.removeLayer(endMarker);
+        if (endMarker) {
+          map.removeLayer(endMarker);
+        }
 
         endMarker = L.marker([place.lat, place.lon], {
           icon: markerIcon
@@ -762,6 +882,11 @@
     }
 
     function useCurrentLocation() {
+      if (!window.isSecureContext) {
+        showError("La posizione funziona solo su HTTPS o localhost. Carica il sito su Netlify, Vercel o GitHub Pages.");
+        return;
+      }
+
       if (!navigator.geolocation) {
         showError("Il tuo dispositivo non supporta la posizione attuale.");
         return;
@@ -776,7 +901,7 @@
 
           startPlace = {
             title: "Posizione attuale",
-            subtitle: "Posizione GPS del dispositivo",
+            subtitle: "GPS dispositivo",
             name: "Posizione attuale",
             lat: lat,
             lon: lon,
@@ -788,9 +913,23 @@
           setStatus("Posizione trovata");
           endInput.focus();
         },
-        function () {
-          showError("Posizione non disponibile. Devi dare il permesso al browser.");
-          setStatus("Permesso posizione negato");
+        function (error) {
+          let message = "Posizione non disponibile.";
+
+          if (error.code === 1) {
+            message = "Permesso posizione negato. Devi consentire la posizione dal browser.";
+          }
+
+          if (error.code === 2) {
+            message = "Il dispositivo non riesce a trovare la posizione.";
+          }
+
+          if (error.code === 3) {
+            message = "La richiesta posizione è scaduta. Riprova.";
+          }
+
+          showError(message);
+          setStatus("Errore posizione");
         },
         {
           enableHighAccuracy: true,
@@ -800,20 +939,14 @@
       );
     }
 
-    async function geocodeManualInput(inputValue) {
-      const clean = inputValue.trim();
+    async function geocodeManualInput(text) {
+      const results = await searchPlaces(text);
 
-      if (clean.length < 2) return null;
-
-      const photonResults = await searchPlacesPhoton(clean);
-
-      if (photonResults.length) {
-        return photonResults[0];
+      if (!results.length) {
+        return null;
       }
 
-      const nominatimResult = await searchPlacesNominatimOnce(clean);
-
-      return nominatimResult;
+      return results[0];
     }
 
     async function ensurePlacesSelected() {
@@ -829,7 +962,7 @@
         const found = await geocodeManualInput(text);
 
         if (!found) {
-          throw new Error("Non ho trovato la partenza. Scrivi meglio, esempio: Napoli oppure Via Roma Napoli.");
+          throw new Error("Non ho trovato la partenza.");
         }
 
         startPlace = found;
@@ -849,7 +982,7 @@
         const found = await geocodeManualInput(text);
 
         if (!found) {
-          throw new Error("Non ho trovato l’arrivo. Scrivi meglio, esempio: Roma oppure Via Vittorio Emanuele Roma.");
+          throw new Error("Non ho trovato l’arrivo.");
         }
 
         endPlace = found;
