@@ -40,7 +40,7 @@
       top: 18px;
       left: 50%;
       transform: translateX(-50%);
-      width: min(960px, calc(100% - 24px));
+      width: min(980px, calc(100% - 24px));
       z-index: 999;
       background: rgba(10, 12, 18, 0.92);
       backdrop-filter: blur(22px);
@@ -176,11 +176,37 @@
       transform: scale(0.98);
     }
 
+    .mode-row {
+      display: flex;
+      gap: 8px;
+      padding: 12px 4px 2px;
+    }
+
+    .mode-btn {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.075);
+      color: rgba(255, 255, 255, 0.8);
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .mode-btn.active {
+      background: linear-gradient(135deg, #4e8cff, #7c5cff);
+      color: white;
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 10px 30px rgba(78, 140, 255, 0.22);
+    }
+
     .info-panel {
       position: absolute;
       left: 18px;
       bottom: 18px;
-      width: min(430px, calc(100% - 36px));
+      width: min(470px, calc(100% - 36px));
+      max-height: 48vh;
+      overflow: auto;
       background: rgba(10, 12, 18, 0.92);
       border: 1px solid rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(20px);
@@ -228,12 +254,211 @@
       white-space: nowrap;
     }
 
-    .error-box {
+    .directions-title {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .directions-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .direction-step {
+      padding: 11px 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.065);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .direction-main {
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .direction-meta {
+      margin-top: 5px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    .street3d-panel {
       position: absolute;
       right: 18px;
       bottom: 18px;
       width: min(430px, calc(100% - 36px));
+      height: 310px;
       z-index: 999;
+      display: none;
+      border-radius: 26px;
+      overflow: hidden;
+      background: radial-gradient(circle at top, rgba(78, 140, 255, 0.28), rgba(7, 9, 14, 0.96) 55%);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .street3d-head {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      right: 14px;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .street3d-title {
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .street3d-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    .small-btn {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.09);
+      color: white;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .street3d-scene {
+      position: absolute;
+      inset: 0;
+      perspective: 700px;
+      overflow: hidden;
+    }
+
+    .sky-glow {
+      position: absolute;
+      top: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 360px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(112, 167, 255, 0.45), transparent 70%);
+      filter: blur(10px);
+    }
+
+    .road-wrap {
+      position: absolute;
+      left: 50%;
+      bottom: -45px;
+      width: 260px;
+      height: 420px;
+      transform: translateX(-50%) rotateX(64deg);
+      transform-origin: bottom;
+    }
+
+    .road {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to right, transparent 0 46%, rgba(255, 255, 255, 0.65) 47% 53%, transparent 54% 100%),
+        linear-gradient(to bottom, #1d2330, #0e1119);
+      clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+      border-left: 2px solid rgba(255, 255, 255, 0.1);
+      border-right: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .road::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 30px,
+        rgba(255, 255, 255, 0.4) 31px,
+        rgba(255, 255, 255, 0.4) 48px
+      );
+      opacity: 0.35;
+      animation: roadMove 1.1s linear infinite;
+    }
+
+    @keyframes roadMove {
+      from { transform: translateY(-50px); }
+      to { transform: translateY(50px); }
+    }
+
+    .car-dot {
+      position: absolute;
+      left: 50%;
+      bottom: 76px;
+      transform: translateX(-50%);
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #4e8cff, #7c5cff);
+      box-shadow: 0 0 35px rgba(78, 140, 255, 0.65);
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+
+    .building {
+      position: absolute;
+      bottom: 0;
+      width: 44px;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .b1 { left: 22px; height: 125px; }
+    .b2 { left: 78px; height: 175px; }
+    .b3 { right: 28px; height: 155px; }
+    .b4 { right: 92px; height: 105px; }
+
+    .street3d-info {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 18px;
+      padding: 12px;
+      z-index: 6;
+    }
+
+    .street3d-step {
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .street3d-meta {
+      margin-top: 5px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.62);
+    }
+
+    .error-box {
+      position: absolute;
+      right: 18px;
+      top: 150px;
+      width: min(430px, calc(100% - 36px));
+      z-index: 3000;
       background: rgba(255, 68, 68, 0.13);
       border: 1px solid rgba(255, 110, 110, 0.35);
       backdrop-filter: blur(18px);
@@ -288,6 +513,14 @@
         width: 100%;
       }
 
+      .mode-row {
+        overflow-x: auto;
+      }
+
+      .mode-btn {
+        flex: 1;
+      }
+
       .suggestions {
         position: absolute;
         top: 58px;
@@ -300,12 +533,22 @@
         bottom: 12px;
         left: 12px;
         width: calc(100% - 24px);
+        max-height: 38vh;
         border-radius: 20px;
+      }
+
+      .street3d-panel {
+        right: 12px;
+        left: 12px;
+        bottom: calc(38vh + 24px);
+        width: auto;
+        height: 250px;
       }
 
       .error-box {
         left: 12px;
         right: 12px;
+        top: auto;
         bottom: 12px;
         width: auto;
       }
@@ -346,6 +589,11 @@
 
       <button class="go-btn" id="goBtn">Vai</button>
     </div>
+
+    <div class="mode-row">
+      <button class="mode-btn active" data-mode="drive">🚗 Auto</button>
+      <button class="mode-btn" data-mode="walk">🚶 A piedi</button>
+    </div>
   </div>
 
   <div class="info-panel" id="infoPanel">
@@ -353,26 +601,40 @@
 
     <div class="route-row">
       <div>
-        <div class="route-name">🚗 Auto</div>
-        <div class="route-desc" id="carDistance">Percorso stradale più veloce</div>
+        <div class="route-name" id="selectedModeName">🚗 Auto</div>
+        <div class="route-desc" id="selectedDistance">Percorso più veloce</div>
       </div>
-      <div class="route-time" id="carTime">--</div>
+      <div class="route-time" id="selectedTime">--</div>
     </div>
 
-    <div class="route-row">
-      <div>
-        <div class="route-name">🚶 A piedi</div>
-        <div class="route-desc" id="walkDistance">Stima a piedi</div>
+    <div class="directions-title">Indicazioni</div>
+    <div class="directions-list" id="directionsList"></div>
+  </div>
+
+  <div class="street3d-panel" id="street3dPanel">
+    <div class="street3d-head">
+      <div class="street3d-title">Vista 3D percorso</div>
+      <div class="street3d-actions">
+        <button class="small-btn" id="prevStepBtn">‹</button>
+        <button class="small-btn" id="nextStepBtn">›</button>
       </div>
-      <div class="route-time" id="walkTime">--</div>
     </div>
 
-    <div class="route-row">
-      <div>
-        <div class="route-name">✈️ Aereo</div>
-        <div class="route-desc" id="airDistance">Stima in linea d’aria</div>
+    <div class="street3d-scene">
+      <div class="sky-glow"></div>
+      <div class="building b1"></div>
+      <div class="building b2"></div>
+      <div class="building b3"></div>
+      <div class="building b4"></div>
+      <div class="road-wrap">
+        <div class="road"></div>
       </div>
-      <div class="route-time" id="airTime">--</div>
+      <div class="car-dot" id="vehicleIcon">🚗</div>
+    </div>
+
+    <div class="street3d-info">
+      <div class="street3d-step" id="street3dStep">Percorso pronto</div>
+      <div class="street3d-meta" id="street3dMeta">Segui le indicazioni</div>
     </div>
   </div>
 
@@ -399,18 +661,26 @@
     const infoPanel = document.getElementById("infoPanel");
     const errorBox = document.getElementById("errorBox");
 
-    const carTimeEl = document.getElementById("carTime");
-    const carDistanceEl = document.getElementById("carDistance");
-    const walkTimeEl = document.getElementById("walkTime");
-    const walkDistanceEl = document.getElementById("walkDistance");
-    const airTimeEl = document.getElementById("airTime");
-    const airDistanceEl = document.getElementById("airDistance");
+    const selectedModeName = document.getElementById("selectedModeName");
+    const selectedDistance = document.getElementById("selectedDistance");
+    const selectedTime = document.getElementById("selectedTime");
+    const directionsList = document.getElementById("directionsList");
+
+    const street3dPanel = document.getElementById("street3dPanel");
+    const street3dStep = document.getElementById("street3dStep");
+    const street3dMeta = document.getElementById("street3dMeta");
+    const vehicleIcon = document.getElementById("vehicleIcon");
+    const prevStepBtn = document.getElementById("prevStepBtn");
+    const nextStepBtn = document.getElementById("nextStepBtn");
 
     let startPlace = null;
     let endPlace = null;
     let startMarker = null;
     let endMarker = null;
     let routeLine = null;
+    let selectedMode = "drive";
+    let currentSteps = [];
+    let currentStepIndex = 0;
 
     function showError(message) {
       errorBox.innerText = message;
@@ -437,7 +707,9 @@
       };
     }
 
-    function formatMinutes(minutes) {
+    function formatMinutes(secondsOrMinutes, isSeconds) {
+      let minutes = isSeconds ? secondsOrMinutes / 60 : secondsOrMinutes;
+
       if (!isFinite(minutes) || minutes <= 0) return "--";
 
       if (minutes < 60) {
@@ -454,32 +726,14 @@
       return hours + " h " + mins + " min";
     }
 
-    function formatKm(km) {
-      if (!isFinite(km)) return "--";
+    function formatKmFromMeters(meters) {
+      if (!isFinite(meters)) return "--";
 
-      if (km < 1) {
-        return Math.round(km * 1000) + " m";
+      if (meters < 1000) {
+        return Math.round(meters) + " m";
       }
 
-      return km.toFixed(1).replace(".", ",") + " km";
-    }
-
-    function haversineDistanceKm(lat1, lon1, lat2, lon2) {
-      const R = 6371;
-
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * Math.PI / 180) *
-        Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-      return R * c;
+      return (meters / 1000).toFixed(1).replace(".", ",") + " km";
     }
 
     async function searchPlacesGeoapify(query) {
@@ -493,7 +747,7 @@
           text: query.trim(),
           limit: "8",
           lang: "it",
-          apiKey: c52bc1e58e1543acaf1233caae7f1bfa
+          apiKey: GEOAPIFY_KEY
         }).toString();
 
       const response = await fetch(url);
@@ -991,42 +1245,73 @@
       }
     }
 
-    async function calculateCarRoute() {
-      const coords =
-        startPlace.lon + "," + startPlace.lat + ";" +
-        endPlace.lon + "," + endPlace.lat;
+    async function calculateGeoapifyRoute() {
+      const waypoints =
+        startPlace.lat + "," + startPlace.lon + "|" +
+        endPlace.lat + "," + endPlace.lon;
 
       const url =
-        "https://router.project-osrm.org/route/v1/driving/" +
-        coords +
-        "?overview=full&geometries=geojson&alternatives=false&steps=false";
+        "https://api.geoapify.com/v1/routing?" +
+        new URLSearchParams({
+          waypoints: waypoints,
+          mode: selectedMode,
+          lang: "it",
+          details: "instruction_details",
+          apiKey: GEOAPIFY_KEY
+        }).toString();
 
       const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error("Errore nel calcolo del percorso in auto.");
+        throw new Error("Errore nel calcolo del percorso. Controlla la API key Geoapify.");
       }
 
       const data = await response.json();
 
-      if (!data.routes || !data.routes.length) {
-        throw new Error("Percorso in auto non trovato.");
+      if (!data.features || !data.features.length) {
+        throw new Error("Percorso non trovato.");
       }
 
-      return data.routes[0];
+      return data.features[0];
     }
 
-    function drawRoute(route) {
+    function flattenCoordinates(geometry) {
+      if (!geometry || !geometry.coordinates) return [];
+
+      if (geometry.type === "LineString") {
+        return geometry.coordinates.map(function (coord) {
+          return [coord[1], coord[0]];
+        });
+      }
+
+      if (geometry.type === "MultiLineString") {
+        const points = [];
+
+        geometry.coordinates.forEach(function (line) {
+          line.forEach(function (coord) {
+            points.push([coord[1], coord[0]]);
+          });
+        });
+
+        return points;
+      }
+
+      return [];
+    }
+
+    function drawRoute(routeFeature) {
       if (routeLine) {
         map.removeLayer(routeLine);
       }
 
-      const coordinates = route.geometry.coordinates.map(function (coord) {
-        return [coord[1], coord[0]];
-      });
+      const coordinates = flattenCoordinates(routeFeature.geometry);
+
+      if (!coordinates.length) {
+        throw new Error("La geometria del percorso non è valida.");
+      }
 
       routeLine = L.polyline(coordinates, {
-        color: "#4e8cff",
+        color: selectedMode === "drive" ? "#4e8cff" : "#54e38e",
         weight: 6,
         opacity: 0.92
       }).addTo(map);
@@ -1036,6 +1321,137 @@
       });
     }
 
+    function extractDirections(routeFeature) {
+      const props = routeFeature.properties || {};
+      const legs = props.legs || [];
+      const steps = [];
+
+      legs.forEach(function (leg) {
+        const legSteps = leg.steps || [];
+
+        legSteps.forEach(function (step) {
+          let instructionText = "Prosegui";
+
+          if (step.instruction && typeof step.instruction === "object") {
+            instructionText =
+              step.instruction.text ||
+              step.instruction.description ||
+              step.instruction.type ||
+              "Prosegui";
+          } else if (typeof step.instruction === "string") {
+            instructionText = step.instruction;
+          } else if (step.name) {
+            instructionText = "Prosegui su " + step.name;
+          }
+
+          steps.push({
+            text: instructionText,
+            distance: step.distance || 0,
+            time: step.time || 0,
+            road: step.name || ""
+          });
+        });
+      });
+
+      if (!steps.length) {
+        steps.push({
+          text: "Segui il percorso evidenziato sulla mappa fino alla destinazione.",
+          distance: props.distance || 0,
+          time: props.time || 0,
+          road: ""
+        });
+      }
+
+      return steps;
+    }
+
+    function renderDirections(steps) {
+      directionsList.innerHTML = "";
+
+      steps.forEach(function (step, index) {
+        const item = document.createElement("div");
+        item.className = "direction-step";
+
+        item.innerHTML = `
+          <div class="direction-main">${index + 1}. ${step.text}</div>
+          <div class="direction-meta">
+            ${formatKmFromMeters(step.distance)} • ${formatMinutes(step.time, true)}
+          </div>
+        `;
+
+        item.addEventListener("click", function () {
+          currentStepIndex = index;
+          update3DStep();
+        });
+
+        directionsList.appendChild(item);
+      });
+    }
+
+    function update3DStep() {
+      if (!currentSteps.length) {
+        street3dStep.innerText = "Percorso pronto";
+        street3dMeta.innerText = "Segui le indicazioni";
+        return;
+      }
+
+      const step = currentSteps[currentStepIndex];
+
+      street3dStep.innerText = step.text;
+      street3dMeta.innerText =
+        "Passaggio " +
+        (currentStepIndex + 1) +
+        " di " +
+        currentSteps.length +
+        " • " +
+        formatKmFromMeters(step.distance) +
+        " • " +
+        formatMinutes(step.time, true);
+
+      vehicleIcon.innerText = selectedMode === "drive" ? "🚗" : "🚶";
+    }
+
+    prevStepBtn.addEventListener("click", function () {
+      if (!currentSteps.length) return;
+
+      currentStepIndex--;
+
+      if (currentStepIndex < 0) {
+        currentStepIndex = currentSteps.length - 1;
+      }
+
+      update3DStep();
+    });
+
+    nextStepBtn.addEventListener("click", function () {
+      if (!currentSteps.length) return;
+
+      currentStepIndex++;
+
+      if (currentStepIndex >= currentSteps.length) {
+        currentStepIndex = 0;
+      }
+
+      update3DStep();
+    });
+
+    document.querySelectorAll(".mode-btn").forEach(function (button) {
+      button.addEventListener("click", function () {
+        document.querySelectorAll(".mode-btn").forEach(function (btn) {
+          btn.classList.remove("active");
+        });
+
+        button.classList.add("active");
+        selectedMode = button.dataset.mode;
+
+        setStatus(selectedMode === "drive" ? "Modalità auto selezionata" : "Modalità a piedi selezionata");
+
+        if (startPlace && endPlace) {
+          calculateRoute();
+        }
+      });
+    });
+
     async function calculateRoute() {
       try {
         goBtn.classList.add("loading");
@@ -1044,33 +1460,27 @@
 
         await ensurePlacesSelected();
 
-        const carRoute = await calculateCarRoute();
+        const routeFeature = await calculateGeoapifyRoute();
 
-        drawRoute(carRoute);
+        drawRoute(routeFeature);
 
-        const carKm = carRoute.distance / 1000;
-        const carMinutes = carRoute.duration / 60;
+        const props = routeFeature.properties || {};
+        const routeDistance = props.distance || 0;
+        const routeTime = props.time || 0;
 
-        const airKm = haversineDistanceKm(
-          startPlace.lat,
-          startPlace.lon,
-          endPlace.lat,
-          endPlace.lon
-        );
+        currentSteps = extractDirections(routeFeature);
+        currentStepIndex = 0;
 
-        const walkMinutes = (airKm / 5) * 60;
-        const airMinutes = (airKm / 750) * 60 + 35;
+        selectedModeName.innerText = selectedMode === "drive" ? "🚗 Auto" : "🚶 A piedi";
+        selectedDistance.innerText = "Distanza: " + formatKmFromMeters(routeDistance);
+        selectedTime.innerText = formatMinutes(routeTime, true);
 
-        carTimeEl.innerText = formatMinutes(carMinutes);
-        carDistanceEl.innerText = "Percorso stradale: " + formatKm(carKm);
-
-        walkTimeEl.innerText = formatMinutes(walkMinutes);
-        walkDistanceEl.innerText = "Stima su distanza diretta: " + formatKm(airKm);
-
-        airTimeEl.innerText = formatMinutes(airMinutes);
-        airDistanceEl.innerText = "Stima volo teorico: " + formatKm(airKm);
+        renderDirections(currentSteps);
+        update3DStep();
 
         infoPanel.style.display = "block";
+        street3dPanel.style.display = "block";
+
         setStatus("Percorso pronto");
       } catch (err) {
         showError(err.message || "Errore durante il calcolo.");
