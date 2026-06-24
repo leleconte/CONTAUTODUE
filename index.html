@@ -1,541 +1,891 @@
-<!DOCTYPE html> 
-<html lang="it"> 
-<head> 
-    <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
-    <title>Contauto Due | Official Digital Hub</title> 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet"> 
-    <style> 
-        :root { 
-            --primary: #0066ff; 
-            --bg: #050505; 
-            --card: #121214; 
-            --text: #ffffff; 
-            --accent: #00f2ff; 
-            --glass: rgba(255, 255, 255, 0.05); 
-            --success: #00ff88; 
-            --promo: #ff3e3e; /* Colore aggiunto per le promo */ 
-        } 
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; } 
-        body {  
-            font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg);  
-            color: var(--text); margin: 0; padding: 0; overflow-x: hidden; 
-        } 
+  <title>ConMaps</title>
 
-        /* Navigazione Schermate */ 
-        .page { display: none; width: 100%; max-width: 450px; margin: 0 auto; padding: 20px; animation: fadeIn 0.3s ease; } 
-        .page.active { display: block; } 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } } 
+  <!-- Leaflet Map -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 
-        /* Header */ 
-        header {  
-            position: sticky; top: 0; z-index: 1000; background: rgba(5,5,5,0.8); 
-            backdrop-filter: blur(15px); padding: 15px; border-bottom: 1px solid var(--glass); 
-            text-align: center; 
-        } 
-        .logo-text { font-weight: 800; letter-spacing: 2px; font-size: 1.1rem; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; } 
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+  </script>
 
-        /* Categorie e Header Sezioni */ 
-        .category-label { font-size: 0.7rem; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px; display: block; } 
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+    }
 
-        /* IA Chat Premium */ 
-        .ai-section { background: var(--glass); border: 1px solid var(--glass); border-radius: 24px; padding: 15px; margin-bottom: 20px; border-top: 2px solid var(--primary); } 
-        #chat-window { height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding: 5px; scroll-behavior: smooth; } 
-        .bubble { padding: 10px 14px; border-radius: 18px; font-size: 0.85rem; max-width: 85%; line-height: 1.4; position: relative; } 
-        .bot { background: #222; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #333; } 
-        .user { background: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(0,102,255,0.2); } 
-          
-        .chat-input-wrap { display: flex; gap: 10px; background: #000; padding: 8px; border-radius: 16px; border: 1px solid #333; } 
-        .chat-input-wrap input { flex: 1; background: transparent; border: none; color: #fff; padding: 5px 10px; outline: none; } 
-        .send-btn { background: var(--primary); border: none; border-radius: 12px; color: white; padding: 8px 15px; font-weight: bold; cursor: pointer; } 
+    body {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: #05070a;
+      color: white;
+    }
 
-        /* Card Auto & Promo */ 
-        .auto-card { background: var(--card); border-radius: 20px; margin-bottom: 12px; border: 1px solid var(--glass); display: flex; align-items: center; padding: 15px; gap: 15px; transition: 0.3s; } 
-        .auto-card:active { transform: scale(0.98); background: #1a1a1c; } 
-        .promo-card { border-left: 4px solid var(--promo); background: linear-gradient(90deg, #1a0a0a, #121214); } 
-        .auto-icon-circle { width: 45px; height: 45px; background: var(--glass); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; border: 1px solid #333; } 
-        .auto-info { flex: 1; } 
-        .badge { font-size: 0.6rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 2px; display: block; } 
-        .price { font-size: 1.1rem; font-weight: 800; color: var(--success); } 
-        .promo-tag { background: var(--promo); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.55rem; font-weight: 900; margin-left: 5px; } 
+    #map {
+      width: 100%;
+      height: 100vh;
+      z-index: 1;
+    }
 
-        /* Eco Calculator Box */ 
-        .eco-box { background: linear-gradient(135deg, #001a33, #000); border: 1px solid var(--primary); border-radius: 20px; padding: 18px; margin-bottom: 20px; } 
+    .top-panel {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(920px, calc(100% - 24px));
+      z-index: 999;
+      background: rgba(10, 12, 18, 0.88);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.55);
+      border-radius: 28px;
+      padding: 14px;
+    }
 
-        /* Menu Inferiore */ 
-        nav {  
-            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.95); 
-            backdrop-filter: blur(20px); display: flex; justify-content: space-around; 
-            padding: 12px 0 25px; border-top: 1px solid var(--glass); z-index: 1000; 
-        } 
-        .nav-item { border: none; background: none; color: #555; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; transition: 0.3s; } 
-        .nav-item.active { color: var(--primary); } 
-        .nav-item svg { width: 22px; height: 22px; } 
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 6px 12px;
+      gap: 10px;
+    }
 
-        /* Elementi Generici */ 
-        .btn-full { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; } 
-        .btn-primary { background: var(--primary); color: white; } 
-        .btn-outline { background: transparent; border: 1px solid #333; color: white; } 
-        .input-std { width:100%; padding:12px; border-radius:8px; background:#000; border:1px solid #333; color:#fff; margin-bottom:10px; font-family: inherit; } 
-          
-        /* Stile Auth */ 
-        .auth-container { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--glass); margin-top: 10px; } 
-        
-        /* Stili Admin Aggiuntivi */ 
-        .admin-item { background: #1a1a1c; padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 3px solid var(--primary); } 
-    </style> 
-</head> 
-<body> 
+    .logo {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
 
-<header> 
-    <div class="logo-text">CONTAUTO DUE</div> 
-</header> 
+    .logo span {
+      color: #70a7ff;
+    }
 
-<div id="showroom" class="page active"> 
-    <span class="category-label">Technical Expert Contauto</span> 
-    <div class="ai-section"> 
-        <div id="chat-window"> 
-            <div class="bubble bot">Buongiorno. Sono l'intelligenza tecnica di Contauto Due. Conosco ogni dettaglio dei marchi Peugeot, Citroen, Skoda, Jaecoo, Omoda, Leapmotor, BYD e Changan. Dimmi il tuo nome.</div> 
-        </div> 
-        <div class="chat-input-wrap"> 
-            <input type="text" id="ai-input" placeholder="Chiedimi di qualsiasi marchio o modello..."> 
-            <button class="send-btn" onclick="processAI()">OK</button> 
-        </div> 
-    </div> 
+    .status {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.62);
+      text-align: right;
+    }
 
-    <span class="category-label">Promozioni Attive (Live)</span> 
-    <div id="promo-home-list"></div> 
+    .search-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 10px;
+      align-items: start;
+    }
 
-    <span class="category-label">Vetrina Modelli Rapida</span> 
-    <div id="car-list"></div> 
-    <div style="height: 80px;"></div> 
-</div> 
+    .field {
+      position: relative;
+    }
 
-<div id="offerte" class="page"> 
-    <span class="category-label">Tutte le Offerte Speciali</span> 
-    <div id="full-promo-list"></div> 
-    <p style="font-size: 0.7rem; color: #555; text-align: center; margin-top: 20px;">Le offerte vengono aggiornate in tempo reale dall'ufficio commerciale.</p> 
-</div> 
+    .field input {
+      width: 100%;
+      height: 52px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      background: rgba(255, 255, 255, 0.075);
+      color: white;
+      outline: none;
+      padding: 0 16px;
+      font-size: 15px;
+      transition: 0.2s ease;
+    }
 
-<div id="sedi" class="page"> 
-    <span class="category-label">Le Nostre Sedi</span> 
-    <div class="auto-card" onclick="window.open('https://www.google.com/maps/search/?api=1&query=Contauto+Due+Teverola')"> 
-        <div class="auto-icon-circle">📍</div> 
-        <div class="auto-info"> 
-            <h3 style="margin:0;">Teverola (CE)</h3> 
-            <p style="font-size:0.7rem; color:#888;">S.S. 7 bis km 11.400 - Zona ASI</p> 
-        </div> 
-        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0818114111'">📞</button> 
-    </div> 
-    <div class="auto-card" onclick="window.open('https://www.google.com/maps/search/?api=1&query=Contauto+Due+San+Marco+Evangelista')"> 
-        <div class="auto-icon-circle">📍</div> 
-        <div class="auto-info"> 
-            <h3 style="margin:0;">Caserta Sud</h3> 
-            <p style="font-size:0.7rem; color:#888;">Via delle Industrie - S. Marco Ev.</p> 
-        </div> 
-        <button class="send-btn" onclick="event.stopPropagation(); window.location.href='tel:0823123456'">📞</button> 
-    </div> 
-</div> 
+    .field input:focus {
+      border-color: rgba(112, 167, 255, 0.8);
+      background: rgba(255, 255, 255, 0.11);
+    }
 
-<div id="service" class="page"> 
-    <span class="category-label">Calcolatori Efficienza</span> 
-    <div class="eco-box"> 
-        <h4 style="margin:0 0 10px 0; font-size:0.85rem; color:var(--accent);">⚡ ECO-CALCULATOR</h4> 
-        <p style="font-size:0.75rem; color:#aaa; margin-bottom:12px;">Confronta subito il tuo risparmio passando all'elettrico.</p> 
-        <input type="number" id="eco-km" class="input-std" placeholder="Km percorsi ogni mese"> 
-        <button class="btn-full btn-primary" style="padding:10px; font-size:0.8rem;" onclick="calcEco()">CALCOLA IL RISPARMIO</button> 
-        <div id="eco-res" style="margin-top:10px; font-size:0.85rem; color:var(--success); font-weight:600; text-align:center;"></div> 
-    </div> 
+    .field input::placeholder {
+      color: rgba(255, 255, 255, 0.48);
+    }
 
-    <span class="category-label">Valutazione Usato</span> 
-    <div class="auto-card" style="flex-direction: column; align-items: flex-start; padding: 20px; border-color: var(--accent);"> 
-        <span class="badge" style="color:var(--accent);">Stima Valore</span> 
-        <input type="text" id="v-modello" placeholder="Marca, Modello e Anno" class="input-std"> 
-        <input type="number" id="v-km" placeholder="Chilometri attuali" class="input-std"> 
-        <button class="btn-full btn-outline" onclick="sendValutazione()">INVIA ALL'AMMINISTRAZIONE</button> 
-    </div> 
-</div> 
+    .suggestions {
+      position: absolute;
+      top: 58px;
+      left: 0;
+      right: 0;
+      background: rgba(8, 10, 16, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 18px;
+      overflow: hidden;
+      max-height: 260px;
+      overflow-y: auto;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 20px 55px rgba(0, 0, 0, 0.55);
+    }
 
-<div id="admin" class="page"> 
-    <span class="category-label">Accesso Riservato Staff</span> 
-    <div id="admin-auth" class="auth-container"> 
-        <p style="font-size: 0.8rem; color: #888; text-align: center; margin-bottom: 15px;">Inserisci il PIN per gestire il listino.</p> 
-        <input type="password" id="admin-pin-field" class="input-std" placeholder="PIN ADMIN"> 
-        <button class="btn-full btn-primary" style="background: var(--promo);" onclick="unlockAdmin()">ACCEDI AL PANNELLO</button> 
-    </div> 
+    .suggestion {
+      padding: 13px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      transition: 0.15s ease;
+    }
 
-    <div id="admin-dashboard" style="display:none;"> 
-        <div style="background: var(--promo); padding: 10px; border-radius: 12px; text-align: center; margin-bottom: 20px;"> 
-            <h3 style="margin:0; font-size: 0.8rem;">GESTIONE HUB ATTIVA</h3> 
-        </div> 
-         
-        <span class="category-label">Nuova Promo / Elimina Esistenti</span> 
-        <div class="ai-section"> 
-            <input type="text" id="adm-brand" class="input-std" placeholder="Brand (es. LEAPMOTOR)"> 
-            <input type="text" id="adm-model" class="input-std" placeholder="Modello"> 
-            <input type="text" id="adm-offer" class="input-std" placeholder="Offerta (es. € 149/mese)"> 
-            <input type="text" id="adm-tag" class="input-std" placeholder="Tag (es. SOTTOCOSTO)"> 
-            <button class="btn-full btn-primary" onclick="adminPublish()">PUBBLICA ORA</button> 
-        </div> 
-        <div id="admin-promo-manage-list"></div> 
+    .suggestion:hover {
+      background: rgba(112, 167, 255, 0.12);
+    }
 
-        <hr style="border:0; border-top:1px solid #333; margin:20px 0;"> 
+    .suggestion-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: white;
+    }
 
-        <span class="category-label">Richieste Valutazione Usato</span> 
-        <div id="admin-leads-list"></div> 
+    .suggestion-sub {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.56);
+      line-height: 1.35;
+    }
 
-        <button class="btn-full btn-outline" onclick="location.reload()">CHIUDI SESSIONE</button> 
-    </div> 
-</div> 
+    .use-location {
+      color: #70a7ff;
+      font-weight: 800;
+    }
 
-<div id="profilo" class="page"> 
-    <div id="auth-screen"> 
-        <div style="text-align: center; padding: 20px 0;"> 
-            <div style="width: 70px; height: 70px; background: var(--primary); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">👤</div> 
-            <h3>Profilo Unico</h3> 
-            <p style="color: #666; font-size: 0.8rem;">Accedi per attivare gli avvisi email personalizzati.</p> 
-        </div> 
+    .go-btn {
+      height: 52px;
+      padding: 0 24px;
+      border: none;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #4e8cff, #7c5cff);
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+      white-space: nowrap;
+    }
 
-        <div class="auth-container"> 
-            <input type="text" id="u-nome" class="input-std" placeholder="Nome"> 
-            <input type="text" id="u-cognome" class="input-std" placeholder="Cognome"> 
-            <input type="email" id="u-email" class="input-std" placeholder="Email (per avvisi)"> 
-            <input type="password" id="u-pass" class="input-std" placeholder="Password"> 
-            <button class="btn-full btn-primary" onclick="doLogin()">ATTIVA ACCOUNT</button> 
-        </div> 
-    </div> 
+    .go-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(78, 140, 255, 0.35);
+    }
 
-    <div id="logged-screen" style="display:none;"> 
-        <div style="text-align: center; padding: 20px 0;"> 
-            <div style="width: 70px; height: 70px; background: var(--success); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">✅</div> 
-            <h3 id="profile-display-name">Digital Garage</h3> 
-            <p id="profile-display-email" style="color: var(--accent); font-size: 0.8rem;"></p> 
-        </div> 
+    .go-btn:active {
+      transform: scale(0.98);
+    }
 
-        <span class="category-label">Aggiungi veicolo</span> 
-        <div class="auto-card" style="flex-direction:column; padding:20px;"> 
-            <input type="text" id="g-model" class="input-std" placeholder="Modello Auto"> 
-            <input type="text" id="g-plate" class="input-std" placeholder="Targa"> 
-            <button class="btn-full btn-primary" onclick="saveGarage()">SALVA NEL GARAGE</button> 
-        </div> 
-          
-        <div id="garage-display"></div> 
-        <button class="btn-full btn-outline" style="margin-top:20px;" onclick="location.reload()">LOGOUT</button> 
-    </div> 
-</div> 
+    .info-panel {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      width: min(420px, calc(100% - 36px));
+      background: rgba(10, 12, 18, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      z-index: 999;
+      padding: 16px;
+      display: none;
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.5);
+    }
 
-<nav> 
-    <button class="nav-item active" onclick="switchPage('showroom', this)"> 
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/></svg> 
-        <span>Auto</span> 
-    </button> 
-    <button class="nav-item" onclick="switchPage('offerte', this)"> 
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.42-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg> 
-        <span>Promo</span> 
-    </button> 
-    <button class="nav-item" onclick="switchPage('sedi', this)"> 
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> 
-        <span>Sedi</span> 
-    </button> 
-    <button class="nav-item" onclick="switchPage('admin', this)"> 
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> 
-        <span>Admin</span> 
-    </button> 
-    <button class="nav-item" onclick="switchPage('profilo', this)"> 
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> 
-        <span>Profilo</span> 
-    </button> 
-</nav> 
+    .info-panel h3 {
+      font-size: 17px;
+      margin-bottom: 12px;
+    }
 
-<script> 
-    let userName = ""; 
-    let userEmail = ""; 
-    const MASTER_PIN = "1234"; 
-    let leadValutazioni = []; 
+    .route-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
+    }
 
-    // DATABASE PROMOZIONI 
-    let adminPromos = [ 
-        { id: 1, brand: "PEUGEOT", model: "Nuova 208 Hybrid", offer: "Tua da € 149/mese", tag: "SOTTOCOSTO", date: "Scade 28/02" }, 
-        { id: 2, brand: "BYD", model: "Atto 3 Elettrica", offer: "EcoBonus + Wallbox Gratis", tag: "GREEN", date: "Scade 15/03" }, 
-        { id: 3, brand: "LEAPMOTOR", model: "T03 Urban", offer: "City car elettrica a tasso zero", tag: "SMART", date: "Offerta Limitata" } 
-    ]; 
+    .route-row:first-of-type {
+      border-top: none;
+    }
 
-    const technicalDB = { 
-        peugeot: { 
-            desc: "Design graffiante (Artiglio del Leone) e interni rivoluzionari i-Cockpit®.", 
-            focus: "estetica futuristica e piacere di guida", 
-            models: { 
-                "208": "Disponibile Benzina, Hybrid (100/136 CV) o E-208 100% elettrica (fino a 410km WLTP).", 
-                "2008": "SUV compatto. Versioni termiche o E-2008 elettrica.", 
-                "3008": "Nuovo SUV Fastback Hybrid o E-3008 (fino a 700km di autonomia).", 
-                "408": "La 'Dynamic Fastback'. Plug-in Hybrid da 180 o 225 CV.", 
-                "5008": "Il grande SUV a 7 posti. Spazio infinito e tecnologia di vertice." 
-            } 
-        }, 
-        citroen: { 
-            desc: "Focus assoluto sul Comfort con sospensioni Progressive Hydraulic Cushions®.", 
-            focus: "comodità di marcia e versatilità", 
-            models: { 
-                "c3": "Nuova generazione. Anche 100% elettrica (ë-C3). Comfort e accessibilità.", 
-                "c4": "Design crossover, comfort 'Advanced Comfort' unico. Anche elettrica.", 
-                "c5 aircross": "Il SUV più comodo del segmento, disponibile Plug-in Hybrid.", 
-                "ami": "La soluzione di micro-mobilità 100% elettrica urbana." 
-            } 
-        }, 
-        skoda: { 
-            desc: "Filosofia 'Simply Clever': spazio intelligente, praticità e solidità costruttiva.", 
-            focus: "spazio interno e soluzioni pratiche 'Simply Clever'", 
-            models: { 
-                "kamiq": "City SUV di successo. Ergonomia perfetta e ottima connettività.", 
-                "kodiaq": "Il SUV ammiraglia a 7 posti. Motori TDI EVO o nuovo Plug-in.", 
-                "octavia": "Icona di spazio e comfort (Wagon o Berlina).", 
-                "enyaq": "Il SUV elettrico puro di Skoda. Fino a 560km di autonomia." 
-            } 
-        }, 
-        byd: { 
-            desc: "Leader mondiale NEV con l'esclusiva Blade Battery (sicura ed efficiente).", 
-            focus: "tecnologia delle batterie e prestazioni elettriche", 
-            models: { 
-                "dolphin": "Hatchback elettrica di segmento C, agile e sicura.", 
-                "atto 3": "SUV elettrico tech, interni futuristici e Blade Battery.", 
-                "seal": "Berlina sportiva 530 CV (AWD), 0-100 in 3.8s.", 
-                "han": "Ammiraglia elettrica di lusso, prestazioni premium." 
-            } 
-        }, 
-        leapmotor: { 
-            desc: "Mobilità elettrica intelligente e democratica, partnership con Stellantis.", 
-            focus: "elettrico accessibile e tecnologico", 
-            models: { 
-                "t03": "City car elettrica 5 porte. Batteria 41.3 kWh, 280km autonomia, ADAS di livello 2.", 
-                "c10": "SUV familiare elettrico moderno, focus su sicurezza e connettività." 
-            } 
-        }, 
-        jaecoo: { 
-            desc: "Nuovo brand di lusso specializzato in SUV con attitudine Off-Road.", 
-            focus: "lusso off-road e robustezza elegante", 
-            models: { 
-                "j7": "SUV 4x4 intelligente. Motore 1.6 TGDI 197 CV, interni minimal e display 14.8 pollici." 
-            } 
-        }, 
-        omoda: { 
-            desc: "Design futuristico (Art in Motion) e tecnologia ADAS di serie completa.", 
-            focus: "stile all'avanguardia e sicurezza", 
-            models: { 
-                "omoda 5": "Crossover sportivo 1.6 Turbo 147 CV o versione elettrica Omoda 5 EV." 
-            } 
-        }, 
-        changan: { 
-            desc: "Uno dei colossi dell'innovazione asiatica, qualità costruttiva impeccabile.", 
-            focus: "innovazione e alta qualità costruttiva", 
-            models: { 
-                "deepal s07": "SUV elettrico dal design futuristico e tecnologia AI avanzata." 
-            } 
-        } 
-    }; 
+    .route-name {
+      font-weight: 800;
+      font-size: 14px;
+    }
 
-    const cars = [ 
-        { brand: "Peugeot", model: "Nuova 3008 Hybrid", price: "€ 38.700", icon: "🦁" }, 
-        { brand: "Leapmotor", model: "T03 Elettrica", price: "€ 18.900", icon: "🔋" }, 
-        { brand: "BYD", model: "Seal AWD 530CV", price: "€ 43.600", icon: "⚡" }, 
-        { brand: "Jaecoo", model: "J7 4WD", price: "€ 33.900", icon: "🏔️" } 
-    ]; 
+    .route-desc {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.56);
+      margin-top: 3px;
+    }
 
-    function initShowroom() { 
-        const list = document.getElementById('car-list'); 
-        list.innerHTML = ""; 
-        cars.forEach(car => { 
-            list.innerHTML += ` 
-                <div class="auto-card"> 
-                    <div class="auto-icon-circle">${car.icon}</div> 
-                    <div class="auto-info"> 
-                        <span class="badge">${car.brand}</span> 
-                        <h3 style="margin:0; font-size:1rem;">${car.model}</h3> 
-                        <div class="price">${car.price}</div> 
-                    </div> 
-                </div> 
-            `; 
-        }); 
-        renderPromos(); 
-    } 
+    .route-time {
+      font-weight: 900;
+      font-size: 15px;
+      text-align: right;
+      white-space: nowrap;
+    }
 
-    function renderPromos() { 
-        const promoHome = document.getElementById('promo-home-list'); 
-        const promoFull = document.getElementById('full-promo-list'); 
-        const adminManage = document.getElementById('admin-promo-manage-list'); 
-        
-        let promoHTML = ""; 
-        let adminHTML = ""; 
+    .error-box {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      width: min(420px, calc(100% - 36px));
+      z-index: 999;
+      background: rgba(255, 68, 68, 0.12);
+      border: 1px solid rgba(255, 110, 110, 0.35);
+      backdrop-filter: blur(18px);
+      border-radius: 20px;
+      padding: 14px;
+      color: #ffd6d6;
+      display: none;
+      font-size: 13px;
+      line-height: 1.4;
+    }
 
-        adminPromos.forEach(p => { 
-            const card = ` 
-                <div class="auto-card promo-card"> 
-                    <div class="auto-info"> 
-                        <span class="badge">${p.brand} <span class="promo-tag">${p.tag}</span></span> 
-                        <h3 style="margin:0;">${p.model}</h3> 
-                        <div class="price">${p.offer}</div> 
-                        <p style="font-size:0.6rem; color:#888; margin-top:4px;">${p.date}</p> 
-                    </div> 
-                </div> 
-            `; 
-            promoHTML += card; 
-            adminHTML += ` 
-                <div class="auto-card" style="padding:10px; border-color:var(--promo);"> 
-                    <div class="auto-info" style="font-size:0.8rem;"><b>${p.brand}</b> - ${p.model}</div> 
-                    <button onclick="adminDeletePromo(${p.id})" style="background:var(--promo); color:white; border:none; padding:5px 10px; border-radius:8px; font-size:0.7rem;">ELIMINA</button> 
-                </div> 
-            `; 
-        }); 
-        promoHome.innerHTML = promoHTML; 
-        promoFull.innerHTML = promoHTML; 
-        if(adminManage) adminManage.innerHTML = adminHTML; 
-    } 
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
 
-    function adminDeletePromo(id) { 
-        if(confirm("Eliminare questa promozione?")) { 
-            adminPromos = adminPromos.filter(p => p.id !== id); 
-            renderPromos(); 
-        } 
-    } 
+    .leaflet-control-zoom {
+      border: none !important;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35) !important;
+    }
 
-    function unlockAdmin() { 
-        const pin = document.getElementById('admin-pin-field').value; 
-        if(pin === MASTER_PIN) { 
-            document.getElementById('admin-auth').style.display = 'none'; 
-            document.getElementById('admin-dashboard').style.display = 'block'; 
-            renderPromos(); 
-            renderAdminLeads(); 
-        } else { 
-            alert("PIN Errato!"); 
-        } 
-    } 
+    .leaflet-control-zoom a {
+      background: rgba(10, 12, 18, 0.9) !important;
+      color: white !important;
+      border: 1px solid rgba(255, 255, 255, 0.11) !important;
+    }
 
-    function adminPublish() { 
-        const b = document.getElementById('adm-brand').value.toUpperCase(); 
-        const m = document.getElementById('adm-model').value; 
-        const o = document.getElementById('adm-offer').value; 
-        const t = document.getElementById('adm-tag').value.toUpperCase(); 
-        if(!b || !m || !o) return alert("Compila i campi principali!"); 
-        adminPromos.unshift({ 
-            id: Date.now(), brand: b, model: m, offer: o, tag: t || "PROMO", date: "Aggiornato ora" 
-        }); 
-        renderPromos(); 
-        alert("Offerta pubblicata con successo!"); 
-        document.getElementById('adm-brand').value = ""; 
-        document.getElementById('adm-model').value = ""; 
-        document.getElementById('adm-offer').value = ""; 
-    } 
+    @media (max-width: 720px) {
+      .top-panel {
+        top: 10px;
+        border-radius: 22px;
+      }
 
-    function renderAdminLeads() { 
-        const list = document.getElementById('admin-leads-list'); 
-        if(!list) return; 
-        list.innerHTML = leadValutazioni.map((l, index) => ` 
-            <div class="admin-item"> 
-                <div style="font-size:0.8rem;"> 
-                    <b>Modello:</b> ${l.modello}<br> 
-                    <b>KM:</b> ${l.km}<br> 
-                    <small>Ricevuta da: ${l.user || "Ospite"}</small> 
-                </div> 
-                <button onclick="respondToLead(${index})" class="btn-full btn-primary" style="padding:5px; font-size:0.7rem; margin-top:5px;">RISPONDI AL CLIENTE</button> 
-            </div> 
-        `).join('') || "<p style='font-size:0.7rem; color:#555;'>Nessuna richiesta pendente.</p>"; 
-    } 
+      .brand {
+        padding-bottom: 10px;
+      }
 
-    function respondToLead(index) { 
-        alert("Sistema di risposta attivato per: " + leadValutazioni[index].modello + ". Il cliente riceverà una notifica."); 
-    } 
+      .logo {
+        font-size: 20px;
+      }
 
-    function doLogin() {  
-        const n = document.getElementById('u-nome').value;  
-        const e = document.getElementById('u-email').value;  
-        if(!n || !e.includes('@')) return alert("Dati incompleti!");  
-        userName = n; userEmail = e;  
-        document.getElementById('auth-screen').style.display = 'none';  
-        document.getElementById('logged-screen').style.display = 'block';  
-        document.getElementById('profile-display-name').innerText = n;  
-        document.getElementById('profile-display-email').innerText = e;  
-        addBotMessage(`Benvenuto ${n}! Sono pronto. Chiedimi qualsiasi cosa sui modelli Peugeot, BYD, Skoda, Leapmotor, Jaecoo o gli altri.`);  
-    }  
+      .status {
+        display: none;
+      }
 
-    function sendValutazione() {  
-        const mod = document.getElementById('v-modello').value;  
-        const km = document.getElementById('v-km').value;  
-        if(!mod || !km) return alert("Inserisci i dati!");  
-        leadValutazioni.push({ modello: mod, km: km, user: userName || "Anonimo" }); 
-        alert("Dati inviati all'amministrazione Contauto Due.");  
-        document.getElementById('v-modello').value = ""; 
-        document.getElementById('v-km').value = ""; 
-    }  
+      .search-grid {
+        grid-template-columns: 1fr;
+      }
 
-    function switchPage(pageId, btn) {  
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));  
-        document.getElementById(pageId).classList.add('active');  
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));  
-        btn.classList.add('active');  
-        if(pageId === 'admin' && document.getElementById('admin-dashboard').style.display === 'block') { 
-            renderPromos(); 
-            renderAdminLeads(); 
-        } 
-    }  
+      .go-btn {
+        width: 100%;
+      }
 
-    function calcEco() {  
-        const km = document.getElementById('eco-km').value;  
-        if(!km) return;  
-        document.getElementById('eco-res').innerHTML = `Risparmio stimato: €${Math.round(km * 0.16)} al mese rispetto al termico!`;  
-    }  
+      .suggestions {
+        position: fixed;
+        top: auto;
+        left: 12px;
+        right: 12px;
+        max-height: 320px;
+      }
 
-    function saveGarage() {  
-        const m = document.getElementById('g-model').value;  
-        const t = document.getElementById('g-plate').value;  
-        if(!m || !t) return alert("Inserisci i dati!");  
-        document.getElementById('garage-display').innerHTML += `<div class="auto-card" style="border-left: 4px solid var(--primary);"><div class="auto-info"><h3>${m}</h3><p>TARGA: ${t.toUpperCase()}</p></div></div>`;  
-    }  
+      .info-panel {
+        bottom: 12px;
+        left: 12px;
+        width: calc(100% - 24px);
+        border-radius: 20px;
+      }
 
-    function addBotMessage(text) {  
-        const win = document.getElementById('chat-window');  
-        win.innerHTML += `<div class="bubble bot">${text}</div>`;  
-        win.scrollTop = win.scrollHeight;  
-    }  
+      .error-box {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        width: auto;
+      }
+    }
+  </style>
+</head>
 
-    function processAI() {  
-        const input = document.getElementById('ai-input');  
-        const win = document.getElementById('chat-window');  
-        const text = input.value.trim();  
-        if(!text) return;  
-        win.innerHTML += `<div class="bubble user">${text}</div>`;  
-        const q = text.toLowerCase();  
-        input.value = "";  
-        let response = "";  
-        const intro = userName ? `${userName}, ` : "";  
-        const isFamily = q.includes("famiglia") || q.includes("spazio") || q.includes("figli");  
-        const isElectric = q.includes("elettrica") || q.includes("batteria") || q.includes("autonomia");  
-        const isOffer = q.includes("offerta") || q.includes("promozione") || q.includes("sconto");  
-        let brandKey = Object.keys(technicalDB).find(b => q.includes(b));  
-        if (brandKey) {  
-            const data = technicalDB[brandKey];  
-            let modelKey = Object.keys(data.models).find(m => q.includes(m));  
-            if (modelKey) {  
-                response = `${intro}La **${brandKey.toUpperCase()} ${modelKey.toUpperCase()}** è un'ottima scelta. ${data.models[modelKey]} Vuoi approfondire l'allestimento?`;  
-            } else {  
-                response = `${intro}per **${brandKey.toUpperCase()}**, i modelli che trattiamo sono: ${Object.keys(data.models).join(", ")}. Quale ti interessa analizzare tecnicamente?`;  
-            }  
-        }   
-        else if (isFamily) {  
-            response = `${intro}per la famiglia ti consiglio la **Skoda Kodiaq** (7 posti) o la nuova **Leapmotor C10**, spaziosa ed elettrica.`;  
-        }  
-        else if (isElectric) {  
-            response = `${intro}sull'elettrico abbiamo il top: la Blade Battery di **BYD** o l'accessibilità della **Leapmotor T03**.`;  
-        }  
-        else if (isOffer) {  
-            response = `${intro}abbiamo ottime promozioni su **Peugeot 208** e **Leapmotor**. Controlla la sezione Promo in basso!`;  
-        }  
-        else {  
-            response = `${intro}come esperto tecnico, posso aiutarti su Peugeot, BYD, Skoda, Leapmotor, Jaecoo, Omoda, Changan e Citroen. Cosa cerchi oggi?`;  
-        }  
-        setTimeout(() => addBotMessage(response), 600);  
-    }  
+<body>
 
-    initShowroom();  
-</script> 
-</body> 
+  <div id="map"></div>
+
+  <div class="top-panel">
+    <div class="brand">
+      <div class="logo">Con<span>Maps</span></div>
+      <div class="status" id="statusText">Mappa mondiale con OpenStreetMap</div>
+    </div>
+
+    <div class="search-grid">
+      <div class="field">
+        <input
+          id="startInput"
+          type="text"
+          placeholder="Partenza"
+          autocomplete="off"
+        />
+        <div class="suggestions" id="startSuggestions"></div>
+      </div>
+
+      <div class="field">
+        <input
+          id="endInput"
+          type="text"
+          placeholder="Arrivo"
+          autocomplete="off"
+        />
+        <div class="suggestions" id="endSuggestions"></div>
+      </div>
+
+      <button class="go-btn" id="goBtn">Vai</button>
+    </div>
+  </div>
+
+  <div class="info-panel" id="infoPanel">
+    <h3>Risultati percorso</h3>
+
+    <div class="route-row">
+      <div>
+        <div class="route-name">🚗 Auto</div>
+        <div class="route-desc" id="carDistance">Percorso stradale più veloce</div>
+      </div>
+      <div class="route-time" id="carTime">--</div>
+    </div>
+
+    <div class="route-row">
+      <div>
+        <div class="route-name">🚶 A piedi</div>
+        <div class="route-desc" id="walkDistance">Stima a piedi</div>
+      </div>
+      <div class="route-time" id="walkTime">--</div>
+    </div>
+
+    <div class="route-row">
+      <div>
+        <div class="route-name">✈️ Aereo</div>
+        <div class="route-desc" id="airDistance">Stima in linea d’aria</div>
+      </div>
+      <div class="route-time" id="airTime">--</div>
+    </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <script>
+    const map = L.map("map", {
+      zoomControl: true
+    }).setView([41.9028, 12.4964], 6);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "© OpenStreetMap"
+    }).addTo(map);
+
+    const startInput = document.getElementById("startInput");
+    const endInput = document.getElementById("endInput");
+    const startSuggestions = document.getElementById("startSuggestions");
+    const endSuggestions = document.getElementById("endSuggestions");
+    const goBtn = document.getElementById("goBtn");
+    const statusText = document.getElementById("statusText");
+    const infoPanel = document.getElementById("infoPanel");
+    const errorBox = document.getElementById("errorBox");
+
+    const carTimeEl = document.getElementById("carTime");
+    const carDistanceEl = document.getElementById("carDistance");
+    const walkTimeEl = document.getElementById("walkTime");
+    const walkDistanceEl = document.getElementById("walkDistance");
+    const airTimeEl = document.getElementById("airTime");
+    const airDistanceEl = document.getElementById("airDistance");
+
+    let startPlace = null;
+    let endPlace = null;
+    let startMarker = null;
+    let endMarker = null;
+    let routeLine = null;
+
+    function showError(message) {
+      errorBox.innerText = message;
+      errorBox.style.display = "block";
+
+      setTimeout(() => {
+        errorBox.style.display = "none";
+      }, 7000);
+    }
+
+    function setStatus(text) {
+      statusText.innerText = text;
+    }
+
+    function debounce(func, delay) {
+      let timeout;
+
+      return function (...args) {
+        clearTimeout(timeout);
+
+        timeout = setTimeout(() => {
+          func.apply(this, args);
+        }, delay);
+      };
+    }
+
+    function formatMinutes(minutes) {
+      if (!isFinite(minutes) || minutes <= 0) return "--";
+
+      if (minutes < 60) {
+        return Math.round(minutes) + " min";
+      }
+
+      const hours = Math.floor(minutes / 60);
+      const mins = Math.round(minutes % 60);
+
+      if (mins === 0) {
+        return hours + " h";
+      }
+
+      return hours + " h " + mins + " min";
+    }
+
+    function formatKm(km) {
+      if (!isFinite(km)) return "--";
+
+      if (km < 1) {
+        return Math.round(km * 1000) + " m";
+      }
+
+      return km.toFixed(1).replace(".", ",") + " km";
+    }
+
+    function haversineDistanceKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+      return R * c;
+    }
+
+    async function searchPlaces(query) {
+      if (!query || query.trim().length < 2) {
+        return [];
+      }
+
+      const url =
+        "https://photon.komoot.io/api/?" +
+        new URLSearchParams({
+          q: query,
+          limit: 6,
+          lang: "it"
+        }).toString();
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error("Errore nel servizio suggerimenti.");
+      }
+
+      const data = await response.json();
+
+      return data.features || [];
+    }
+
+    function getPlaceName(feature) {
+      const p = feature.properties || {};
+
+      const parts = [
+        p.name,
+        p.street,
+        p.city,
+        p.county,
+        p.state,
+        p.country
+      ].filter(Boolean);
+
+      const unique = [...new Set(parts)];
+
+      return unique.join(", ");
+    }
+
+    function getPlaceTitle(feature) {
+      const p = feature.properties || {};
+
+      return p.name || p.street || p.city || p.country || "Luogo";
+    }
+
+    function renderSuggestions(features, box, input, type) {
+      box.innerHTML = "";
+
+      if (type === "start") {
+        const locationItem = document.createElement("div");
+        locationItem.className = "suggestion";
+
+        locationItem.innerHTML = `
+          <div class="suggestion-title use-location">📍 Usa posizione attuale</div>
+          <div class="suggestion-sub">Richiede il permesso del dispositivo</div>
+        `;
+
+        locationItem.onclick = () => {
+          box.style.display = "none";
+          useCurrentLocation();
+        };
+
+        box.appendChild(locationItem);
+      }
+
+      features.forEach((feature) => {
+        const item = document.createElement("div");
+        item.className = "suggestion";
+
+        const title = getPlaceTitle(feature);
+        const fullName = getPlaceName(feature);
+
+        item.innerHTML = `
+          <div class="suggestion-title">${title}</div>
+          <div class="suggestion-sub">${fullName}</div>
+        `;
+
+        item.onclick = () => {
+          const coords = feature.geometry.coordinates;
+          const lon = coords[0];
+          const lat = coords[1];
+
+          const selectedPlace = {
+            name: fullName,
+            lat,
+            lon
+          };
+
+          if (type === "start") {
+            startPlace = selectedPlace;
+          } else {
+            endPlace = selectedPlace;
+          }
+
+          input.value = fullName;
+          box.style.display = "none";
+
+          setMarker(type, selectedPlace);
+        };
+
+        box.appendChild(item);
+      });
+
+      box.style.display = "block";
+    }
+
+    const handleStartSearch = debounce(async () => {
+      try {
+        const query = startInput.value.trim();
+
+        if (query.length < 2) {
+          startSuggestions.style.display = "none";
+          return;
+        }
+
+        const results = await searchPlaces(query);
+        renderSuggestions(results, startSuggestions, startInput, "start");
+      } catch (err) {
+        showError("Non riesco a caricare i suggerimenti della partenza.");
+      }
+    }, 350);
+
+    const handleEndSearch = debounce(async () => {
+      try {
+        const query = endInput.value.trim();
+
+        if (query.length < 2) {
+          endSuggestions.style.display = "none";
+          return;
+        }
+
+        const results = await searchPlaces(query);
+        renderSuggestions(results, endSuggestions, endInput, "end");
+      } catch (err) {
+        showError("Non riesco a caricare i suggerimenti dell’arrivo.");
+      }
+    }, 350);
+
+    startInput.addEventListener("input", () => {
+      startPlace = null;
+      handleStartSearch();
+    });
+
+    endInput.addEventListener("input", () => {
+      endPlace = null;
+      handleEndSearch();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!startSuggestions.contains(e.target) && e.target !== startInput) {
+        startSuggestions.style.display = "none";
+      }
+
+      if (!endSuggestions.contains(e.target) && e.target !== endInput) {
+        endSuggestions.style.display = "none";
+      }
+    });
+
+    function setMarker(type, place) {
+      const markerIcon = L.divIcon({
+        html: type === "start" ? "📍" : "🏁",
+        className: "",
+        iconSize: [28, 28],
+        iconAnchor: [14, 28]
+      });
+
+      if (type === "start") {
+        if (startMarker) {
+          map.removeLayer(startMarker);
+        }
+
+        startMarker = L.marker([place.lat, place.lon], {
+          icon: markerIcon
+        }).addTo(map).bindPopup("Partenza<br>" + place.name);
+
+      } else {
+        if (endMarker) {
+          map.removeLayer(endMarker);
+        }
+
+        endMarker = L.marker([place.lat, place.lon], {
+          icon: markerIcon
+        }).addTo(map).bindPopup("Arrivo<br>" + place.name);
+      }
+
+      const points = [];
+
+      if (startPlace) points.push([startPlace.lat, startPlace.lon]);
+      if (endPlace) points.push([endPlace.lat, endPlace.lon]);
+
+      if (points.length === 1) {
+        map.setView(points[0], 13);
+      }
+
+      if (points.length === 2) {
+        map.fitBounds(points, {
+          padding: [80, 80]
+        });
+      }
+    }
+
+    function useCurrentLocation() {
+      if (!navigator.geolocation) {
+        showError("Il tuo dispositivo non supporta la posizione attuale.");
+        return;
+      }
+
+      setStatus("Richiesta posizione in corso...");
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+
+          startPlace = {
+            name: "Posizione attuale",
+            lat,
+            lon
+          };
+
+          startInput.value = "Posizione attuale";
+          setMarker("start", startPlace);
+          setStatus("Posizione trovata");
+        },
+        () => {
+          showError("Posizione non disponibile. Devi dare il permesso al browser.");
+          setStatus("Permesso posizione negato");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 12000,
+          maximumAge: 0
+        }
+      );
+    }
+
+    async function geocodeManualInput(inputValue) {
+      const results = await searchPlaces(inputValue);
+
+      if (!results.length) {
+        return null;
+      }
+
+      const first = results[0];
+      const coords = first.geometry.coordinates;
+
+      return {
+        name: getPlaceName(first),
+        lat: coords[1],
+        lon: coords[0]
+      };
+    }
+
+    async function ensurePlacesSelected() {
+      if (!startPlace) {
+        const text = startInput.value.trim();
+
+        if (text.length < 2) {
+          throw new Error("Inserisci una partenza.");
+        }
+
+        const found = await geocodeManualInput(text);
+
+        if (!found) {
+          throw new Error("Non ho trovato la partenza.");
+        }
+
+        startPlace = found;
+        startInput.value = found.name;
+        setMarker("start", startPlace);
+      }
+
+      if (!endPlace) {
+        const text = endInput.value.trim();
+
+        if (text.length < 2) {
+          throw new Error("Inserisci un arrivo.");
+        }
+
+        const found = await geocodeManualInput(text);
+
+        if (!found) {
+          throw new Error("Non ho trovato l’arrivo.");
+        }
+
+        endPlace = found;
+        endInput.value = found.name;
+        setMarker("end", endPlace);
+      }
+    }
+
+    async function calculateCarRoute() {
+      const coords =
+        startPlace.lon + "," + startPlace.lat + ";" +
+        endPlace.lon + "," + endPlace.lat;
+
+      const url =
+        "https://router.project-osrm.org/route/v1/driving/" +
+        coords +
+        "?overview=full&geometries=geojson&alternatives=false&steps=false";
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error("Errore nel calcolo del percorso in auto.");
+      }
+
+      const data = await response.json();
+
+      if (!data.routes || !data.routes.length) {
+        throw new Error("Percorso in auto non trovato.");
+      }
+
+      return data.routes[0];
+    }
+
+    function drawRoute(route) {
+      if (routeLine) {
+        map.removeLayer(routeLine);
+      }
+
+      const coordinates = route.geometry.coordinates.map((coord) => {
+        return [coord[1], coord[0]];
+      });
+
+      routeLine = L.polyline(coordinates, {
+        color: "#4e8cff",
+        weight: 6,
+        opacity: 0.9
+      }).addTo(map);
+
+      map.fitBounds(routeLine.getBounds(), {
+        padding: [80, 80]
+      });
+    }
+
+    async function calculateRoute() {
+      try {
+        goBtn.classList.add("loading");
+        goBtn.innerText = "Calcolo...";
+        setStatus("Calcolo percorso...");
+
+        await ensurePlacesSelected();
+
+        const carRoute = await calculateCarRoute();
+        drawRoute(carRoute);
+
+        const carKm = carRoute.distance / 1000;
+        const carMinutes = carRoute.duration / 60;
+
+        const airKm = haversineDistanceKm(
+          startPlace.lat,
+          startPlace.lon,
+          endPlace.lat,
+          endPlace.lon
+        );
+
+        /*
+          A piedi:
+          Per semplicità qui è una stima.
+          Velocità media circa 5 km/h.
+        */
+        const walkMinutes = (airKm / 5) * 60;
+
+        /*
+          Aereo:
+          Stima teorica in linea d’aria.
+          Velocità media 750 km/h + 35 minuti indicativi.
+        */
+        const airMinutes = (airKm / 750) * 60 + 35;
+
+        carTimeEl.innerText = formatMinutes(carMinutes);
+        carDistanceEl.innerText = "Percorso stradale: " + formatKm(carKm);
+
+        walkTimeEl.innerText = formatMinutes(walkMinutes);
+        walkDistanceEl.innerText = "Distanza stimata: " + formatKm(airKm);
+
+        airTimeEl.innerText = formatMinutes(airMinutes);
+        airDistanceEl.innerText = "Volo teorico: " + formatKm(airKm);
+
+        infoPanel.style.display = "block";
+        setStatus("Percorso pronto");
+      } catch (err) {
+        showError(err.message || "Errore durante il calcolo.");
+        setStatus("Errore");
+      } finally {
+        goBtn.classList.remove("loading");
+        goBtn.innerText = "Vai";
+      }
+    }
+
+    goBtn.addEventListener("click", calculateRoute);
+
+    startInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        endInput.focus();
+      }
+    });
+
+    endInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        calculateRoute();
+      }
+    });
+  </script>
+</body>
 </html>
