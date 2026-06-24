@@ -194,31 +194,59 @@
 
     .nav-panel {
       position: absolute;
-      left: 18px;
+      right: 18px;
       bottom: 18px;
-      width: min(480px, calc(100% - 36px));
-      max-height: 50vh;
-      overflow: auto;
+      width: min(390px, calc(100% - 36px));
+      max-height: 42vh;
+      overflow: hidden;
       background: rgba(10, 12, 18, 0.93);
       border: 1px solid rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-radius: 24px;
       z-index: 999;
-      padding: 16px;
       display: none;
       box-shadow: 0 20px 70px rgba(0, 0, 0, 0.5);
     }
 
+    .nav-panel.collapsed {
+      max-height: 72px;
+    }
+
+    .nav-header {
+      padding: 14px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+    }
+
     .nav-title {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 900;
-      margin-bottom: 10px;
       color: #70a7ff;
     }
 
+    .collapse-btn {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.075);
+      color: white;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .nav-content {
+      padding: 14px 15px;
+      overflow: auto;
+      max-height: calc(42vh - 58px);
+    }
+
     .current-instruction {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 900;
       line-height: 1.25;
       margin-bottom: 12px;
@@ -357,19 +385,28 @@
       }
 
       .suggestions {
-        max-height: 240px;
+        max-height: 230px;
       }
 
       .nav-panel {
-        bottom: 12px;
+        right: 12px;
         left: 12px;
-        width: calc(100% - 24px);
-        max-height: 42vh;
+        bottom: 12px;
+        width: auto;
+        max-height: 34vh;
         border-radius: 20px;
       }
 
+      .nav-panel.collapsed {
+        max-height: 66px;
+      }
+
+      .nav-content {
+        max-height: calc(34vh - 58px);
+      }
+
       .current-instruction {
-        font-size: 17px;
+        font-size: 16px;
       }
 
       .error-box {
@@ -389,12 +426,12 @@
   <div class="top-panel">
     <div class="brand">
       <div class="logo">Con<span>Maps</span></div>
-      <div class="status" id="statusText">Localizzazione obbligatoria</div>
+      <div class="status" id="statusText">Scegli partenza e arrivo</div>
     </div>
 
     <div class="search-grid">
       <div class="field">
-        <input id="startInput" type="text" placeholder="Partenza: posizione attuale obbligatoria" autocomplete="off" readonly />
+        <input id="startInput" type="text" placeholder="Partenza" autocomplete="off" />
         <div class="suggestions" id="startSuggestions"></div>
       </div>
 
@@ -413,17 +450,23 @@
   </div>
 
   <div class="nav-panel" id="navPanel">
-    <div class="nav-title">Navigazione</div>
-    <div class="current-instruction" id="currentInstruction">Attiva la posizione e scegli un arrivo</div>
-
-    <div class="route-meta">
-      <div class="meta-pill" id="modeMeta">🚗 Auto</div>
-      <div class="meta-pill" id="distanceMeta">--</div>
-      <div class="meta-pill" id="timeMeta">--</div>
-      <div class="meta-pill" id="gpsMeta">GPS in attesa</div>
+    <div class="nav-header">
+      <div class="nav-title">Navigazione</div>
+      <button class="collapse-btn" id="collapseBtn">Riduci</button>
     </div>
 
-    <div class="directions-list" id="directionsList"></div>
+    <div class="nav-content">
+      <div class="current-instruction" id="currentInstruction">Scegli partenza e arrivo</div>
+
+      <div class="route-meta">
+        <div class="meta-pill" id="modeMeta">🚗 Auto</div>
+        <div class="meta-pill" id="distanceMeta">--</div>
+        <div class="meta-pill" id="timeMeta">--</div>
+        <div class="meta-pill" id="gpsMeta">GPS facoltativo</div>
+      </div>
+
+      <div class="directions-list" id="directionsList"></div>
+    </div>
   </div>
 
   <div class="error-box" id="errorBox"></div>
@@ -442,6 +485,7 @@
 
     const startInput = document.getElementById("startInput");
     const endInput = document.getElementById("endInput");
+    const startSuggestions = document.getElementById("startSuggestions");
     const endSuggestions = document.getElementById("endSuggestions");
     const goBtn = document.getElementById("goBtn");
     const statusText = document.getElementById("statusText");
@@ -454,14 +498,16 @@
     const distanceMeta = document.getElementById("distanceMeta");
     const timeMeta = document.getElementById("timeMeta");
     const gpsMeta = document.getElementById("gpsMeta");
+    const collapseBtn = document.getElementById("collapseBtn");
 
     let selectedMode = "drive";
 
-    let userLocation = null;
+    let startPlace = null;
     let endPlace = null;
 
-    let userMarker = null;
+    let startMarker = null;
     let endMarker = null;
+    let userMarker = null;
     let routeLine = null;
 
     let watchId = null;
@@ -470,8 +516,6 @@
     let currentSteps = [];
     let currentStepIndex = 0;
     let routePoints = [];
-
-    startInput.value = "📍 La tua posizione attuale";
 
     function showError(message) {
       errorBox.innerText = message;
@@ -588,10 +632,10 @@
       lastPosition = { lat, lon };
     }
 
-    function requireLocationOnce() {
+    function getCurrentLocation() {
       return new Promise(function (resolve, reject) {
         if (!window.isSecureContext) {
-          reject(new Error("La posizione funziona solo su HTTPS o localhost. Carica il sito su Netlify, Vercel o GitHub Pages."));
+          reject(new Error("La posizione funziona solo su HTTPS o localhost."));
           return;
         }
 
@@ -609,20 +653,27 @@
             const lon = position.coords.longitude;
             const heading = position.coords.heading;
 
-            userLocation = { lat, lon };
+            const place = {
+              title: "Posizione attuale",
+              subtitle: "GPS dispositivo",
+              name: "📍 Posizione attuale",
+              lat: lat,
+              lon: lon,
+              source: "gps"
+            };
+
             updateUserMarker(lat, lon, heading);
 
-            startInput.value = "📍 La tua posizione attuale";
             gpsMeta.innerText = "GPS attivo";
             setStatus("Localizzazione attiva");
 
-            resolve(userLocation);
+            resolve(place);
           },
           function (error) {
             let message = "Localizzazione non disponibile.";
 
             if (error.code === 1) {
-              message = "Devi consentire la posizione per usare ConMaps.";
+              message = "Devi consentire la posizione dal browser.";
             }
 
             if (error.code === 2) {
@@ -646,6 +697,8 @@
     }
 
     function startWatchingLocation() {
+      if (!startPlace || startPlace.source !== "gps") return;
+
       if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
       }
@@ -656,7 +709,8 @@
           const lon = position.coords.longitude;
           const heading = position.coords.heading;
 
-          userLocation = { lat, lon };
+          startPlace.lat = lat;
+          startPlace.lon = lon;
 
           updateUserMarker(lat, lon, heading);
           gpsMeta.innerText = "GPS attivo";
@@ -711,7 +765,8 @@
             p.formatted ||
             [p.name, p.street, p.city, p.country].filter(Boolean).join(", "),
           lat: coords[1],
-          lon: coords[0]
+          lon: coords[0],
+          source: "geoapify"
         };
       });
     }
@@ -755,7 +810,8 @@
           subtitle: uniqueDetails.join(", "),
           name: [title, uniqueDetails.join(", ")].filter(Boolean).join(" — "),
           lat: coords[1],
-          lon: coords[0]
+          lon: coords[0],
+          source: "photon"
         };
       });
     }
@@ -772,8 +828,44 @@
       }
     }
 
-    function renderEndSuggestions(results) {
-      endSuggestions.innerHTML = "";
+    function renderSuggestions(results, box, input, type) {
+      box.innerHTML = "";
+
+      if (type === "start") {
+        const locationItem = document.createElement("div");
+        locationItem.className = "suggestion";
+
+        locationItem.innerHTML = `
+          <div class="suggestion-title use-location">📍 Usa posizione attuale</div>
+          <div class="suggestion-sub">Il browser ti chiederà il permesso GPS</div>
+        `;
+
+        locationItem.addEventListener("mousedown", async function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          try {
+            const place = await getCurrentLocation();
+            selectPlace(place, input, box, "start");
+          } catch (err) {
+            showError(err.message);
+          }
+        });
+
+        locationItem.addEventListener("touchstart", async function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          try {
+            const place = await getCurrentLocation();
+            selectPlace(place, input, box, "start");
+          } catch (err) {
+            showError(err.message);
+          }
+        });
+
+        box.appendChild(locationItem);
+      }
 
       if (!results.length) {
         const emptyItem = document.createElement("div");
@@ -781,11 +873,11 @@
 
         emptyItem.innerHTML = `
           <div class="suggestion-title">Nessun suggerimento</div>
-          <div class="suggestion-sub">Scrivi meglio l’arrivo, esempio: Via Roma Napoli</div>
+          <div class="suggestion-sub">Scrivi meglio, esempio: Napoli oppure Via Roma Napoli</div>
         `;
 
-        endSuggestions.appendChild(emptyItem);
-        endSuggestions.style.display = "block";
+        box.appendChild(emptyItem);
+        box.style.display = "block";
         return;
       }
 
@@ -801,42 +893,94 @@
         item.addEventListener("mousedown", function (event) {
           event.preventDefault();
           event.stopPropagation();
-          selectEndPlace(place);
+          selectPlace(place, input, box, type);
         });
 
         item.addEventListener("touchstart", function (event) {
           event.preventDefault();
           event.stopPropagation();
-          selectEndPlace(place);
+          selectPlace(place, input, box, type);
         });
 
-        endSuggestions.appendChild(item);
+        box.appendChild(item);
       });
 
-      endSuggestions.style.display = "block";
+      box.style.display = "block";
     }
 
-    function selectEndPlace(place) {
-      endPlace = place;
-      endInput.value = place.name;
-
-      if (endMarker) {
-        map.removeLayer(endMarker);
+    function selectPlace(place, input, box, type) {
+      if (type === "start") {
+        startPlace = place;
+        input.value = place.name;
+        setMarker("start", place);
+        endInput.focus();
+      } else {
+        endPlace = place;
+        input.value = place.name;
+        setMarker("end", place);
       }
 
-      endMarker = L.marker([place.lat, place.lon]).addTo(map).bindPopup("Arrivo<br>" + place.name);
+      box.style.display = "none";
+    }
 
-      endSuggestions.style.display = "none";
+    function setMarker(type, place) {
+      if (type === "start") {
+        if (startMarker) {
+          map.removeLayer(startMarker);
+        }
 
-      if (userLocation) {
-        map.fitBounds([
-          [userLocation.lat, userLocation.lon],
-          [place.lat, place.lon]
-        ], {
-          padding: [80, 80]
+        if (place.source !== "gps") {
+          startMarker = L.marker([place.lat, place.lon]).addTo(map).bindPopup("Partenza<br>" + place.name);
+        }
+      } else {
+        if (endMarker) {
+          map.removeLayer(endMarker);
+        }
+
+        endMarker = L.marker([place.lat, place.lon]).addTo(map).bindPopup("Arrivo<br>" + place.name);
+      }
+
+      const points = [];
+
+      if (startPlace) points.push([startPlace.lat, startPlace.lon]);
+      if (endPlace) points.push([endPlace.lat, endPlace.lon]);
+
+      if (points.length === 1) {
+        map.setView(points[0], 14);
+      }
+
+      if (points.length === 2) {
+        map.fitBounds(points, {
+          padding: [90, 90]
         });
       }
     }
+
+    const handleStartSearch = debounce(async function () {
+      const query = startInput.value.trim();
+
+      if (query.length < 2) {
+        renderSuggestions([], startSuggestions, startInput, "start");
+        return;
+      }
+
+      startSuggestions.innerHTML = `
+        <div class="suggestion">
+          <div class="suggestion-title">Cerco...</div>
+          <div class="suggestion-sub">Ricerca nel database mondiale</div>
+        </div>
+      `;
+
+      startSuggestions.style.display = "block";
+
+      try {
+        const results = await searchPlaces(query);
+        renderSuggestions(results, startSuggestions, startInput, "start");
+      } catch (err) {
+        showError("Errore durante la ricerca della partenza.");
+        renderSuggestions([], startSuggestions, startInput, "start");
+      }
+    }, 350);
 
     const handleEndSearch = debounce(async function () {
       const query = endInput.value.trim();
@@ -857,16 +1001,29 @@
 
       try {
         const results = await searchPlaces(query);
-        renderEndSuggestions(results);
+        renderSuggestions(results, endSuggestions, endInput, "end");
       } catch (err) {
         showError("Errore durante la ricerca dell’arrivo.");
-        renderEndSuggestions([]);
+        renderSuggestions([], endSuggestions, endInput, "end");
       }
     }, 350);
+
+    startInput.addEventListener("input", function () {
+      startPlace = null;
+      handleStartSearch();
+    });
 
     endInput.addEventListener("input", function () {
       endPlace = null;
       handleEndSearch();
+    });
+
+    startInput.addEventListener("focus", function () {
+      if (startInput.value.trim().length >= 2) {
+        handleStartSearch();
+      } else {
+        renderSuggestions([], startSuggestions, startInput, "start");
+      }
     });
 
     endInput.addEventListener("focus", function () {
@@ -876,36 +1033,60 @@
     });
 
     document.addEventListener("mousedown", function (event) {
+      if (!startInput.contains(event.target) && !startSuggestions.contains(event.target)) {
+        startSuggestions.style.display = "none";
+      }
+
       if (!endInput.contains(event.target) && !endSuggestions.contains(event.target)) {
         endSuggestions.style.display = "none";
       }
     });
 
     document.addEventListener("touchstart", function (event) {
+      if (!startInput.contains(event.target) && !startSuggestions.contains(event.target)) {
+        startSuggestions.style.display = "none";
+      }
+
       if (!endInput.contains(event.target) && !endSuggestions.contains(event.target)) {
         endSuggestions.style.display = "none";
       }
     });
 
-    async function geocodeManualEnd() {
-      const text = endInput.value.trim();
+    async function geocodeManualInput(input, type) {
+      const text = input.value.trim();
 
       if (text.length < 2) {
-        throw new Error("Inserisci un arrivo.");
+        throw new Error(type === "start" ? "Inserisci una partenza." : "Inserisci un arrivo.");
       }
 
       const results = await searchPlaces(text);
 
       if (!results.length) {
-        throw new Error("Non ho trovato l’arrivo.");
+        throw new Error(type === "start" ? "Non ho trovato la partenza." : "Non ho trovato l’arrivo.");
       }
 
-      selectEndPlace(results[0]);
+      return results[0];
+    }
+
+    async function ensurePlacesSelected() {
+      if (!startPlace) {
+        const foundStart = await geocodeManualInput(startInput, "start");
+        startPlace = foundStart;
+        startInput.value = foundStart.name;
+        setMarker("start", foundStart);
+      }
+
+      if (!endPlace) {
+        const foundEnd = await geocodeManualInput(endInput, "end");
+        endPlace = foundEnd;
+        endInput.value = foundEnd.name;
+        setMarker("end", foundEnd);
+      }
     }
 
     async function calculateRouteFromGeoapify() {
       const waypoints =
-        userLocation.lat + "," + userLocation.lon + "|" +
+        startPlace.lat + "," + startPlace.lon + "|" +
         endPlace.lat + "," + endPlace.lon;
 
       const url =
@@ -975,7 +1156,7 @@
       }).addTo(map);
 
       map.fitBounds(routeLine.getBounds(), {
-        padding: [90, 90]
+        padding: [100, 100]
       });
     }
 
@@ -1058,15 +1239,11 @@
 
       if (active) {
         active.classList.add("active");
-        active.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest"
-        });
       }
     }
 
     function updateCurrentInstructionByPosition(lat, lon) {
-      if (!currentSteps.length) return;
+      if (!currentSteps.length || !endPlace) return;
 
       const destinationDistance = distanceMeters(lat, lon, endPlace.lat, endPlace.lon);
 
@@ -1111,13 +1288,9 @@
       try {
         goBtn.classList.add("loading");
         goBtn.innerText = "Calcolo...";
-        setStatus("Controllo GPS...");
+        setStatus("Calcolo percorso...");
 
-        await requireLocationOnce();
-
-        if (!endPlace) {
-          await geocodeManualEnd();
-        }
+        await ensurePlacesSelected();
 
         const routeFeature = await calculateRouteFromGeoapify();
 
@@ -1133,19 +1306,23 @@
         modeMeta.innerText = selectedMode === "drive" ? "🚗 Auto" : "🚶 A piedi";
         distanceMeta.innerText = formatDistance(distance);
         timeMeta.innerText = formatTime(time);
+        gpsMeta.innerText = startPlace.source === "gps" ? "GPS attivo" : "Partenza scelta";
 
         renderDirections();
         updateInstructionUI();
 
         navPanel.style.display = "block";
+        navPanel.classList.remove("collapsed");
+        collapseBtn.innerText = "Riduci";
 
-        startWatchingLocation();
+        if (startPlace.source === "gps") {
+          startWatchingLocation();
+          map.setView([startPlace.lat, startPlace.lon], 18, {
+            animate: true
+          });
+        }
 
-        map.setView([userLocation.lat, userLocation.lon], 18, {
-          animate: true
-        });
-
-        setStatus("Navigazione attiva");
+        setStatus("Percorso pronto");
       } catch (err) {
         showError(err.message || "Errore durante il calcolo.");
         setStatus("Errore");
@@ -1166,13 +1343,30 @@
 
         setStatus(selectedMode === "drive" ? "Modalità auto" : "Modalità a piedi");
 
-        if (userLocation && endPlace) {
+        if (startPlace && endPlace) {
           calculateRoute();
         }
       });
     });
 
+    collapseBtn.addEventListener("click", function () {
+      navPanel.classList.toggle("collapsed");
+
+      if (navPanel.classList.contains("collapsed")) {
+        collapseBtn.innerText = "Apri";
+      } else {
+        collapseBtn.innerText = "Riduci";
+      }
+    });
+
     goBtn.addEventListener("click", calculateRoute);
+
+    startInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        endInput.focus();
+      }
+    });
 
     endInput.addEventListener("keydown", function (event) {
       if (event.key === "Enter") {
@@ -1183,7 +1377,8 @@
 
     window.addEventListener("load", function () {
       navPanel.style.display = "block";
-      currentInstruction.innerText = "Per usare ConMaps devi attivare la localizzazione e scegliere un arrivo.";
+      navPanel.classList.add("collapsed");
+      currentInstruction.innerText = "Scegli partenza e arrivo.";
     });
   </script>
 </body>
